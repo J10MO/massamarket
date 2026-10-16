@@ -7,10 +7,13 @@
     "setup": "npm run db:setup --prefix server",
     "import": "npm run import --prefix server",
     "dev": "concurrently -n api,web -c red,magenta \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "build": "npm run build --prefix client",
+    "build": "cd server && npm install && cd ../client && npm install --include=dev && npm run build",
     "start": "npm start --prefix server"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

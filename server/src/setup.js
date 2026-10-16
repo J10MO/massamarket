@@ -7,17 +7,21 @@ import bcrypt from 'bcryptjs';
 const url = new URL(process.env.DATABASE_URL);
 const dbName = url.pathname.slice(1);
 
-// 1. Create the database if it doesn't exist (connect to the default "postgres" db first)
-const adminUrl = new URL(url);
-adminUrl.pathname = '/postgres';
-const admin = new pg.Client({ connectionString: adminUrl.toString() });
-await admin.connect();
-const exists = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
-if (!exists.rowCount) {
+// 1. Create the database only if it doesn't exist (hosted DBs like Neon already provide it)
+const probe = new pg.Client({ connectionString: url.toString() });
+try {
+  await probe.connect();
+  await probe.end();
+} catch (err) {
+  if (err.code !== '3D000') throw err; // 3D000 = database does not exist
+  const adminUrl = new URL(url);
+  adminUrl.pathname = '/postgres';
+  const admin = new pg.Client({ connectionString: adminUrl.toString() });
+  await admin.connect();
   await admin.query(`CREATE DATABASE "${dbName.replace(/"/g, '')}"`);
+  await admin.end();
   console.log(`Created database ${dbName}`);
 }
-await admin.end();
 
 // Imported after the database exists, since db.js opens a pool on it
 const { query, pool } = await import('./db.js');

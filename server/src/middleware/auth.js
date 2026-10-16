@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET is not set in server/.env');
+}
 const SECRET = () => process.env.JWT_SECRET || 'dev-secret';
 
 export const signToken = (user) =>
