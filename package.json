@@ -1,0 +1,16 @@
+{
+  "name": "dress-shop",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "setup": "npm run db:setup --prefix server",
+    "import": "npm run import --prefix server",
+    "dev": "concurrently -n api,web -c red,magenta \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
