@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { price } from '../api.js';
 import { useStore } from '../store.jsx';
 import { HeartIcon, StarIcon } from './Icons.jsx';
+import { ListingCard } from '../market/shared.jsx';
 
 const BADGES = { new: 'جديد', sale: 'تخفيض', hot: 'الأكثر طلباً 🔥' };
 
@@ -54,6 +55,11 @@ export default function ProductCard({ product: p, eager }) {
   );
 }
 
+// The new-dresses catalog mixes store products with new items from approved shops
+export function CatalogCard({ item, eager }) {
+  return item.kind === 'listing' ? <ListingCard listing={item} /> : <ProductCard product={item} eager={eager} />;
+}
+
 export function ProductGrid({ products, loading, count = 8 }) {
   if (loading && !products.length) {
     return (
@@ -67,7 +73,7 @@ export function ProductGrid({ products, loading, count = 8 }) {
   return (
     <div className="grid">
       {products.map((p, i) => (
-        <ProductCard key={p.id} product={p} eager={i < 4} />
+        <CatalogCard key={`${p.kind || 'product'}-${p.id}`} item={p} eager={i < 4} />
       ))}
     </div>
   );

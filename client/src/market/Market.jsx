@@ -32,12 +32,13 @@ export default function Market() {
 
   useEffect(() => {
     api('/categories').then(setCategories).catch(() => {});
-    api('/market/listings?boosted=1&limit=12').then((d) => setBoosted(d.items)).catch(() => {});
+    api('/market/listings?type=used&boosted=1&limit=12').then((d) => setBoosted(d.items)).catch(() => {});
   }, []);
 
   const load = (page) => {
     const qs = new URLSearchParams(params);
     qs.set('page', page);
+    qs.set('type', 'used'); // new shop dresses are shown with the store's new dresses, not here
     setLoading(true);
     api(`/market/listings?${qs}`)
       .then((d) => {
@@ -93,12 +94,6 @@ export default function Market() {
           <FilterIcon width="18" height="18" />{filterCount > 0 && <span className="pill-count">{filterCount}</span>}
         </button>
       </form>
-
-      <div className="type-tabs" role="tablist" aria-label="نوع البائع">
-        {[['', 'الكل'], ['shop', '🏬 المحلات'], ['used', '♻ المستعمل']].map(([v, label]) => (
-          <button key={v} role="tab" aria-selected={(params.get('type') || '') === v} className={(params.get('type') || '') === v ? 'on' : ''} onClick={() => update({ type: v })}>{label}</button>
-        ))}
-      </div>
 
       {boosted.length > 0 && !params.toString() && (
         <section className="m-boosted">

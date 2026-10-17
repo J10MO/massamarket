@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, price } from '../api.js';
 import { useStore } from '../store.jsx';
-import ProductCard, { Img, ProductGrid } from '../components/ProductCard.jsx';
+import { CatalogCard, Img, ProductGrid } from '../components/ProductCard.jsx';
 import { InstagramIcon, ReturnIcon, StarIcon, TruckIcon } from '../components/Icons.jsx';
 import { igHandle } from '../components/Layout.jsx';
 import { ListingCard } from '../market/shared.jsx';
@@ -23,6 +23,8 @@ function Hero({ categories, featured }) {
   const [cat, setCat] = useState('');
   const navigate = useNavigate();
   const hero = featured[0];
+  const heroName = hero?.name || hero?.title;
+  const heroLink = hero && (hero.kind === 'listing' ? `/market/${hero.id}` : `/product/${hero.id}`);
   const avatars = featured.slice(1, 4);
 
   return (
@@ -35,11 +37,11 @@ function Hero({ categories, featured }) {
         </div>
         <div className="hero-media">
           <div className="hero-rays" aria-hidden="true" />
-          {hero && <Img src={hero.image_url} alt={hero.name} eager />}
+          {hero && <Img src={hero.image_url} alt={heroName} eager />}
           {hero && (
-            <Link to={`/product/${hero.id}`} className="hero-tag">
+            <Link to={heroLink} className="hero-tag">
               <small>الأكثر طلباً</small>
-              <b>{hero.name}</b>
+              <b>{heroName}</b>
             </Link>
           )}
         </div>
@@ -104,7 +106,7 @@ export default function Home() {
     api('/products?featured=1&category=evening&sort=rating&limit=8').then((d) => setFeatured(d.items)).catch(() => {});
     api('/products?badge=sale&sort=popular&limit=10').then((d) => setDeals(d.items)).catch(() => {});
     api('/products?sort=rating&limit=7&category=evening').then((d) => setLookbook(d.items)).catch(() => {});
-    api('/market/listings?limit=10').then((d) => setUsed(d.items)).catch(() => {});
+    api('/market/listings?type=used&limit=10').then((d) => setUsed(d.items)).catch(() => {});
     api('/merchants?limit=12').then(setShops).catch(() => {});
   }, []);
 
@@ -167,7 +169,7 @@ export default function Home() {
           <div className="container">
             <SectionTitle sub="خصومات لفترة محدودة" light>عروض الأسبوع</SectionTitle>
             <div className="scroll-x deals-row">
-              {deals.map((p) => <ProductCard key={p.id} product={p} />)}
+              {deals.map((p) => <CatalogCard key={`${p.kind}-${p.id}`} item={p} />)}
             </div>
             <div className="center">
               <Link to="/shop?badge=sale" className="btn btn-rose">كل العروض</Link>

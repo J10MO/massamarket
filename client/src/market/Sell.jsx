@@ -97,6 +97,9 @@ export default function Sell() {
           <Link to="/shops/join" className="type-tab-link">بيانات المحل</Link>
         </div>
       )}
+      {shop && !id && (
+        <p className="muted sell-where">{asShop ? '🏬 يظهر مع فساتين المتجر الجديدة باسم محلچ.' : '♻ يظهر في سوق المستعمل.'}</p>
+      )}
       {!shop && !id && (
         <div className="join-shop">
           <div><b>🏬 عندچ محل فساتين؟</b><small>سجّلي محلچ وانشري فساتين جديدة باسمه مع صفحة خاصة.</small></div>
