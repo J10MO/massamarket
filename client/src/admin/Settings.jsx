@@ -108,7 +108,7 @@ export default function Settings() {
               <label className="a-switch"><input type="checkbox" checked={!!form.market_auto_approve} onChange={(e) => set('market_auto_approve')(e.target.checked)} /><span />نشر الإعلانات مباشرة بدون مراجعة</label>
             </div>
             <label>عمولة الموقع من كل بيع (%)<input className="a-input" type="number" min="0" max="50" step="0.5" value={form.market_commission} onChange={set('market_commission')} /></label>
-            <label>إيقاف النشر إذا تجاوزت العمولة غير المدفوعة <small className="a-muted">(د.ع — 0 بدون حد)</small><input className="a-input" type="number" min="0" step="1000" value={form.commission_limit} onChange={set('commission_limit')} /></label>
+            <label>إيقاف النشر عندما تصل العمولة غير المدفوعة إلى <small className="a-muted">(د.ع — 0 بدون حد)</small><input className="a-input" type="number" min="0" step="1000" value={form.commission_limit} onChange={set('commission_limit')} /></label>
             <label className="span-2">شروط البيع (تظهر للبائعة)<textarea className="a-input" rows="2" value={form.market_terms} onChange={set('market_terms')} /></label>
           </section>
 

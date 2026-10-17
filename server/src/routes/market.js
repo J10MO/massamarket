@@ -172,7 +172,7 @@ router.post('/listings', requireAuth, async (req, res) => {
   const limit = Number(s.commission_limit) || 0;
   if (limit > 0) {
     const due = await commissionDue(req.user.id);
-    if (due > limit) {
+    if (due >= limit) {
       return bad(res, `عليچ عمولات مستحقة بقيمة ${due.toLocaleString('en-US')} د.ع. سدّديها من مركز البائعة لتتمكني من نشر إعلانات جديدة.`, 402);
     }
   }

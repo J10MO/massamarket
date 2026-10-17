@@ -58,12 +58,12 @@ function CommissionBanner({ sum, onPaid }) {
   if (!due && !pending) return null;
   return (
     <>
-      <div className={`commission-banner ${limit && due > limit ? 'blocked' : ''}`}>
+      <div className={`commission-banner ${limit && due >= limit ? 'blocked' : ''}`}>
         <div>
           {due > 0 ? <b>عمولة مستحقة: {price(due)}</b> : <b>⏳ دفعة عمولة بانتظار التأكيد: {price(pending)}</b>}
           <small>
-            {due > 0 && limit > 0 && due > limit
-              ? 'تجاوزتِ الحد المسموح — سدّدي العمولة لتتمكني من نشر إعلانات جديدة.'
+            {due > 0 && limit > 0 && due >= limit
+              ? 'وصلت عمولتچ للحد المسموح — سدّديها لتتمكني من نشر إعلانات جديدة.'
               : due > 0 ? 'سدّديها إلكترونياً بخطوة وحدة.' : 'سنؤكدها فور وصول التحويل.'}
           </small>
         </div>
