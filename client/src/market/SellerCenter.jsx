@@ -192,6 +192,7 @@ function MyListings({ onCount }) {
               </div>
               <Link to={`/market/${l.id}`}><b>{l.title}</b></Link>
               <span className="my-price">{price(l.price)} · {l.size}</span>
+              {l.shop_name && <span className="l-shop">🏬 {l.shop_name}{l.stock !== null && <> · المتبقي: {l.stock}</>}</span>}
               {l.status === 'rejected' && <small className="error-text">السبب: {l.reject_reason}</small>}
               {l.pending_orders > 0 && <span className="m-badge new">🛍 {l.pending_orders} طلب جديد</span>}
               <PromoStatus l={l} />
@@ -199,7 +200,7 @@ function MyListings({ onCount }) {
                 {['active', 'pending'].includes(l.status) && !l.is_boosted && l.last_promotion?.status !== 'pending' && (
                   <button className="boost-btn" onClick={() => setBoost(l)}>✦ روّجي</button>
                 )}
-                {!['reserved', 'sold'].includes(l.status) && <Link to={`/sell/${l.id}`}>تعديل</Link>}
+                {(l.merchant_id || !['reserved', 'sold'].includes(l.status)) && <Link to={`/sell/${l.id}`}>{l.merchant_id && l.stock === 0 ? 'إعادة تخزين' : 'تعديل'}</Link>}
                 {['active', 'pending'].includes(l.status) && <button onClick={() => act(l, 'hide')}>إخفاء</button>}
                 {l.status === 'hidden' && <button onClick={() => act(l, 'show')}>إظهار</button>}
                 {['active', 'hidden'].includes(l.status) && <button onClick={() => act(l, 'sold')}>بيع خارجياً</button>}
@@ -252,6 +253,7 @@ function Sales({ onCount }) {
               <span className="my-price">{price(o.price)}{Number(o.commission) > 0 && <small className="muted"> · صافي {price(o.price - o.commission)}</small>}</span>
               <div className="buyer-box">
                 <b>👤 {o.buyer_name}</b>
+                {o.size && <span>📏 المقاس المطلوب: <b>{o.size}</b></span>}
                 <span dir="ltr">{o.buyer_phone}</span>
                 <span>📍 {o.city} — {o.address}</span>
                 {o.notes && <span className="m-note">💬 {o.notes}</span>}

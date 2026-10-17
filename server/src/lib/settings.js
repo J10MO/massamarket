@@ -25,6 +25,10 @@ export const DEFAULT_SETTINGS = {
     { days: 15, price: 10000 },
     { days: 30, price: 18000 },
   ],
+  // Merchants (dress shops publishing under their own name)
+  merchants_enabled: true,
+  merchant_auto_approve: true, // approved shops publish without per-listing review
+  merchant_commission: 5, // % taken from each completed shop sale
   // Electronic payment accounts: used for paid boosts, commission and online store orders
   payment_methods: [{ name: 'سوبر كي (Super Qi)', details: '07717288459' }],
   online_payment_enabled: true, // let store customers pay by transfer instead of cash on delivery

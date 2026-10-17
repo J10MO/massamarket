@@ -60,6 +60,7 @@ export default function Settings() {
           free_shipping_over: Number(form.free_shipping_over) || 0,
           market_commission: Number(form.market_commission) || 0,
           commission_limit: Number(form.commission_limit) || 0,
+          merchant_commission: Number(form.merchant_commission) || 0,
           boost_plans: (form.boost_plans || []).filter((p) => p.days > 0 && p.price >= 0).sort((a, b) => a.days - b.days),
           payment_methods: (form.payment_methods || []).filter((m) => m.name.trim()),
         },
@@ -110,6 +111,15 @@ export default function Settings() {
             <label>عمولة الموقع من كل بيع (%)<input className="a-input" type="number" min="0" max="50" step="0.5" value={form.market_commission} onChange={set('market_commission')} /></label>
             <label>إيقاف النشر عندما تصل العمولة غير المدفوعة إلى <small className="a-muted">(د.ع — 0 بدون حد)</small><input className="a-input" type="number" min="0" step="1000" value={form.commission_limit} onChange={set('commission_limit')} /></label>
             <label className="span-2">شروط البيع (تظهر للبائعة)<textarea className="a-input" rows="2" value={form.market_terms} onChange={set('market_terms')} /></label>
+          </section>
+
+          <h4 className="a-sub">🏬 المحلات والتجار</h4>
+          <section className="a-fields">
+            <div className="a-switches span-2">
+              <label className="a-switch"><input type="checkbox" checked={form.merchants_enabled !== false} onChange={(e) => set('merchants_enabled')(e.target.checked)} /><span />السماح بتسجيل محلات جديدة</label>
+              <label className="a-switch"><input type="checkbox" checked={form.merchant_auto_approve !== false} onChange={(e) => set('merchant_auto_approve')(e.target.checked)} /><span />المحلات المفعّلة تنشر بدون مراجعة كل إعلان</label>
+            </div>
+            <label>عمولة الموقع من مبيعات المحلات (%)<input className="a-input" type="number" min="0" max="50" step="0.5" value={form.merchant_commission} onChange={set('merchant_commission')} /></label>
           </section>
 
           <h4 className="a-sub">باقات الترويج</h4>

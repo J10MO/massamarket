@@ -87,7 +87,8 @@ export default function Account() {
         <Link to="/my/purchases"><span>🛍</span>مشترياتي من المستعمل<small>طلباتي من البائعات</small></Link>
         <Link to="/sell"><span>➕</span>بيعي فستانچ<small>إعلان مجاني</small></Link>
         <Link to="/wishlist"><span>♡</span>المفضلة<small>من المتجر</small></Link>
-        <Link to="/my/saved"><span>♡</span>المحفوظة<small>من المستعمل</small></Link>
+        <Link to="/my/saved"><span>♡</span>المحفوظة<small>من السوق</small></Link>
+        <Link to="/shops/join"><span>🏬</span>حساب المحل<small>للتجار وأصحاب المحلات</small></Link>
       </nav>
 
       <h2 className="h2">طلباتي من المتجر</h2>

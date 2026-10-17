@@ -94,6 +94,12 @@ export default function Market() {
         </button>
       </form>
 
+      <div className="type-tabs" role="tablist" aria-label="نوع البائع">
+        {[['', 'الكل'], ['shop', '🏬 المحلات'], ['used', '♻ المستعمل']].map(([v, label]) => (
+          <button key={v} role="tab" aria-selected={(params.get('type') || '') === v} className={(params.get('type') || '') === v ? 'on' : ''} onClick={() => update({ type: v })}>{label}</button>
+        ))}
+      </div>
+
       {boosted.length > 0 && !params.toString() && (
         <section className="m-boosted">
           <div className="m-row-head">
@@ -115,7 +121,10 @@ export default function Market() {
 
       <div className="shop-head">
         <p className="muted">{meta.total} فستان معروض</p>
-        {saved.saved.length > 0 && <Link to="/my/saved" className="m-link">♡ المحفوظة ({saved.saved.length})</Link>}
+        <span className="m-head-links">
+          <Link to="/shops" className="m-link">🏬 كل المحلات</Link>
+          {saved.saved.length > 0 && <Link to="/my/saved" className="m-link">♡ المحفوظة ({saved.saved.length})</Link>}
+        </span>
       </div>
 
       {error && <p className="alert">{error}</p>}

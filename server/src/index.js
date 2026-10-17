@@ -10,6 +10,8 @@ import orderRoutes from './routes/orders.js';
 import adminRoutes from './routes/admin.js';
 import marketRoutes from './routes/market.js';
 import adminMarketRoutes from './routes/adminMarket.js';
+import merchantRoutes from './routes/merchants.js';
+import adminMerchantRoutes from './routes/adminMerchants.js';
 import { UPLOAD_DIR } from './lib/upload.js';
 import { query } from './db.js';
 import { ensureDefaultSettings } from './lib/settings.js';
@@ -40,6 +42,8 @@ app.use('/api/auth', wrap(authRoutes));
 app.use('/api/orders', wrap(orderRoutes));
 app.use('/api/market', wrap(marketRoutes));
 app.use('/api/admin/market', wrap(adminMarketRoutes));
+app.use('/api/merchants', wrap(merchantRoutes));
+app.use('/api/admin/merchants', wrap(adminMerchantRoutes));
 app.use('/api/admin', wrap(adminRoutes));
 
 // Serve the built React app in production

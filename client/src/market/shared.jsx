@@ -6,6 +6,7 @@ import { Img } from '../components/ProductCard.jsx';
 import { HeartIcon } from '../components/Icons.jsx';
 
 export const CONDITIONS = {
+  new: { label: 'جديد', hint: 'قطعة جديدة من المحل' },
   new_tag: { label: 'جديد بالتاغ', hint: 'لم يُلبس أبداً والتاغ موجود' },
   like_new: { label: 'كالجديد', hint: 'لُبس مرة أو مرتين بدون أي أثر' },
   very_good: { label: 'جيد جداً', hint: 'استخدام خفيف وبحالة ممتازة' },
@@ -70,7 +71,7 @@ export function ListingCard({ listing: l, saved }) {
       <Link to={`/market/${l.id}`} className="card-media">
         <Img src={l.image_url} alt={l.title} />
         {l.is_boosted && <span className="l-boost">✦ إعلان مميز</span>}
-        {l.status === 'reserved' && <span className="l-ribbon">محجوز</span>}
+        {l.status === 'reserved' && <span className="l-ribbon">{l.shop ? 'نفدت الكمية' : 'محجوز'}</span>}
         {l.status === 'sold' && <span className="l-ribbon sold">مباع</span>}
         <span className="l-cond">{CONDITIONS[l.condition]?.label}</span>
       </Link>
@@ -80,6 +81,12 @@ export function ListingCard({ listing: l, saved }) {
         </button>
       )}
       <Link to={`/market/${l.id}`} className="card-body">
+        {l.shop && (
+          <span className="l-shop">
+            {l.shop.logo && <img src={l.shop.logo} alt="" referrerPolicy="no-referrer" />}
+            {l.shop.name} <i>✓</i>
+          </span>
+        )}
         <h3>{l.title}</h3>
         <div className="card-meta">
           <span className="l-size">{l.size}</span>

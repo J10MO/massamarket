@@ -347,3 +347,20 @@ textarea.a-input { resize: vertical; }
 .a-paybox { display: grid; gap: 4px; border-radius: 12px; padding: 8px 10px; margin-top: 6px; background: #fff; border: 1px dashed var(--a-line); }
 .a-paybox.pay-awaiting { border-color: #e9c46a; background: #fffaf0; }
 .a-paybox.pay-paid { border-color: #9fd8b4; background: #f2fbf5; }
+
+/* Merchants */
+.a-merchants { display: grid; gap: 10px; }
+.a-merchant { display: flex; align-items: center; gap: 12px; text-align: start; background: #fff; border: 1px solid var(--a-line); border-radius: 16px; padding: 10px 12px; }
+.a-merchant:hover { border-color: var(--rose); }
+.a-merchant img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: var(--media-bg); flex-shrink: 0; }
+.a-merchant > div { min-width: 0; display: grid; gap: 1px; }
+.a-merchant > div:nth-child(2) { flex: 1; }
+.a-merchant b { color: var(--plum); }
+.a-merchant small { color: var(--muted); font-size: 12px; }
+.a-merchant-side { justify-items: end; text-align: end; }
+.a-shop-head { position: relative; display: flex; align-items: flex-end; gap: 12px; }
+.a-shop-cover { position: absolute; inset: 0 0 30px; width: 100%; height: calc(100% - 30px); object-fit: cover; border-radius: 14px; opacity: .25; }
+.a-shop-logo { position: relative; width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; flex-shrink: 0; }
+.a-shop-head > div { position: relative; }
+.a-shop-head h3 { color: var(--plum); font-size: 19px; }
+@media (min-width: 1024px) { .a-merchants { grid-template-columns: 1fr 1fr; } }

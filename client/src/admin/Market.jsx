@@ -129,7 +129,7 @@ function Listings() {
                 {l.reports > 0 && <span className="a-flag count a-danger-bg">⚑ {l.reports}</span>}
               </button>
               <div className="a-product-body">
-                <small className="a-muted">#{l.id} · {l.seller_name} · {l.city}</small>
+                <small className="a-muted">#{l.id} · {l.shop_name ? `🏬 ${l.shop_name}` : l.seller_name} · {l.city}</small>
                 <b className="a-ellipsis">{l.title}</b>
                 <div className="a-product-meta"><span className="a-price">{price(l.price)}</span><span className="a-muted">{l.size} · {CONDITIONS[l.condition]?.label}</span></div>
                 <div className="a-product-actions">

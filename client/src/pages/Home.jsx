@@ -6,6 +6,7 @@ import ProductCard, { Img, ProductGrid } from '../components/ProductCard.jsx';
 import { InstagramIcon, ReturnIcon, StarIcon, TruckIcon } from '../components/Icons.jsx';
 import { igHandle } from '../components/Layout.jsx';
 import { ListingCard } from '../market/shared.jsx';
+import { ShopCard } from '../market/Shops.jsx';
 
 function SectionTitle({ children, sub, light }) {
   return (
@@ -92,6 +93,7 @@ export default function Home() {
   const [deals, setDeals] = useState([]);
   const [lookbook, setLookbook] = useState([]);
   const [used, setUsed] = useState([]);
+  const [shops, setShops] = useState([]);
   const [active, setActive] = useState('all');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +105,7 @@ export default function Home() {
     api('/products?badge=sale&sort=popular&limit=10').then((d) => setDeals(d.items)).catch(() => {});
     api('/products?sort=rating&limit=7&category=evening').then((d) => setLookbook(d.items)).catch(() => {});
     api('/market/listings?limit=10').then((d) => setUsed(d.items)).catch(() => {});
+    api('/merchants?limit=12').then(setShops).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -191,6 +194,19 @@ export default function Home() {
               {used.map((l) => <ListingCard key={l.id} listing={l} />)}
             </div>
           )}
+        </section>
+      )}
+
+      {shops.length > 0 && (
+        <section className="container section">
+          <SectionTitle sub="محلات موثّقة تعرض أحدث الفساتين">محلات وبوتيكات</SectionTitle>
+          <div className="scroll-x shops-row">
+            {shops.map((s) => <ShopCard key={s.id} shop={s} />)}
+          </div>
+          <div className="center">
+            <Link to="/shops" className="btn btn-outline">كل المحلات</Link>{' '}
+            <Link to="/shops/join" className="btn btn-soft">🏬 سجّلي محلچ</Link>
+          </div>
         </section>
       )}
 

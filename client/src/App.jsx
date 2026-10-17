@@ -15,6 +15,7 @@ import Listing from './market/Listing.jsx';
 import Sell from './market/Sell.jsx';
 import SellerCenter from './market/SellerCenter.jsx';
 import { Purchases, Saved, SellerProfile } from './market/Purchases.jsx';
+import { MerchantApply, ShopPage, ShopsDirectory } from './market/Shops.jsx';
 import './market/market.css';
 
 // The admin dashboard is a separate app, loaded only when /admin is opened
@@ -57,11 +58,14 @@ export default function App() {
           <Route path="/my/purchases" element={<Purchases />} />
           <Route path="/my/saved" element={<Saved />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
+          <Route path="/shops" element={<ShopsDirectory />} />
+          <Route path="/shops/join" element={<MerchantApply />} />
+          <Route path="/shop/:slug" element={<ShopPage />} />
           <Route path="*" element={<div className="container empty"><h2>الصفحة غير موجودة</h2></div>} />
         </Routes>
       </main>
       <Footer />
-      {!['/product', '/market', '/sell', '/my/'].some((p) => pathname.startsWith(p)) && <WhatsappButton />}
+      {!['/product', '/market', '/sell', '/my/', '/shop'].some((p) => pathname.startsWith(p)) && <WhatsappButton />}
       <BottomNav />
       {toast && <div key={toast.id} className="toast" role="status">{toast.msg}</div>}
     </>

@@ -49,9 +49,10 @@ router.get('/listings', async (req, res) => {
   const [list, count, counts] = await Promise.all([
     query(
       `SELECT l.*, u.name AS seller_name, u.phone AS seller_phone, u.email AS seller_email, c.name AS category_name,
-         (l.boosted_until > now()) AS is_boosted,
+         (l.boosted_until > now()) AS is_boosted, mm.shop_name,
          (SELECT count(*)::int FROM listing_reports r WHERE r.listing_id = l.id AND r.status = 'open') AS reports
        FROM listings l JOIN users u ON u.id = l.seller_id LEFT JOIN categories c ON c.id = l.category_id
+       LEFT JOIN merchants mm ON mm.id = l.merchant_id
        WHERE ${w} ORDER BY (l.status = 'pending') DESC, l.created_at DESC LIMIT ${limit} OFFSET ${(page - 1) * limit}`,
       params
     ),

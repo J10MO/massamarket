@@ -181,3 +181,37 @@ CREATE TABLE IF NOT EXISTS commission_payments (
   admin_note     TEXT,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- v5: merchants (dress shops / boutiques) that publish under their own name after admin approval
+CREATE TABLE IF NOT EXISTS merchants (
+  id            SERIAL PRIMARY KEY,
+  user_id       INT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  shop_name     TEXT NOT NULL,
+  slug          TEXT NOT NULL UNIQUE,
+  description   TEXT,
+  logo_url      TEXT,
+  cover_url     TEXT,
+  phone         TEXT NOT NULL,
+  whatsapp      TEXT,
+  instagram     TEXT,
+  website       TEXT,
+  city          TEXT NOT NULL,
+  address       TEXT,
+  map_url       TEXT,
+  hours         TEXT,
+  status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
+  reject_reason TEXT,
+  approved_at   TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS merchants_status_idx ON merchants(status);
+
+-- Shop listings: new items with several sizes and a stock count (used listings keep stock NULL = one piece)
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS merchant_id INT REFERENCES merchants(id) ON DELETE SET NULL;
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS sizes TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS stock INT;
+CREATE INDEX IF NOT EXISTS listings_merchant_idx ON listings(merchant_id);
+ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_condition_check;
+ALTER TABLE listings ADD CONSTRAINT listings_condition_check CHECK (condition IN ('new', 'new_tag', 'like_new', 'very_good', 'good'));
+ALTER TABLE market_orders ADD COLUMN IF NOT EXISTS size TEXT;

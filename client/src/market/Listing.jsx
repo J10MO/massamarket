@@ -4,13 +4,15 @@ import { api, price } from '../api.js';
 import { useStore } from '../store.jsx';
 import { Gallery } from '../pages/Product.jsx';
 import { BackIcon, CloseIcon, HeartIcon, WhatsappIcon } from '../components/Icons.jsx';
+import { ShopContacts, VerifiedBadge } from './Shops.jsx';
 import { CONDITIONS, ListingCard, LISTING_STATUS, MARKET_ORDER_STATUS, savePct, Stars, timeAgo, useSaved } from './shared.jsx';
 
 const REPORT_REASONS = ['صور غير حقيقية أو مأخوذة من الإنترنت', 'الفستان غير نظيف أو تالف', 'سعر مبالغ فيه أو احتيال', 'محتوى غير لائق', 'سبب آخر'];
 
 function OrderSheet({ listing, onClose, onDone }) {
   const { user, settings } = useStore();
-  const [form, setForm] = useState({ buyer_name: user?.name || '', buyer_phone: user?.phone || '', city: '', address: '', notes: '' });
+  const [form, setForm] = useState({ buyer_name: user?.name || '', buyer_phone: user?.phone || '', city: '', address: '', notes: '', size: '' });
+  const needsSize = listing.stock !== null && listing.sizes?.length > 0;
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
@@ -20,6 +22,7 @@ function OrderSheet({ listing, onClose, onDone }) {
     setBusy(true);
     setError('');
     try {
+      if (needsSize && !form.size) throw new Error('اختاري المقاس');
       onDone(await api(`/market/listings/${listing.id}/order`, { method: 'POST', body: form }));
     } catch (err) {
       setError(err.message);
@@ -37,8 +40,16 @@ function OrderSheet({ listing, onClose, onDone }) {
         </div>
         <div className="m-mini">
           <img src={listing.images[0]} alt="" referrerPolicy="no-referrer" />
-          <div><b>{listing.title}</b><span>{listing.size} · {price(listing.price)}</span></div>
+          <div><b>{listing.title}</b><span>{needsSize ? (form.size || 'اختاري المقاس') : listing.size} · {price(listing.price)}</span></div>
         </div>
+        {needsSize && (
+          <div>
+            <span className="sell-label">المقاس</span>
+            <div className="sizes">
+              {listing.sizes.map((x) => <button type="button" key={x} className={form.size === x ? 'on' : ''} onClick={() => setForm({ ...form, size: x })}>{x}</button>)}
+            </div>
+          </div>
+        )}
         <label>الاسم<input required value={form.buyer_name} onChange={set('buyer_name')} autoComplete="name" /></label>
         <label>رقم الهاتف (واتساب)<input required type="tel" dir="ltr" inputMode="tel" placeholder="07XX XXX XXXX" value={form.buyer_phone} onChange={set('buyer_phone')} /></label>
         <label>المحافظة
@@ -118,7 +129,7 @@ export default function Listing() {
   let cta;
   if (l.is_owner) cta = <Link to="/my/listings" className="btn btn-outline btn-lg">إدارة إعلانچ</Link>;
   else if (l.my_order && ['pending', 'accepted'].includes(l.my_order.status)) cta = <Link to="/my/purchases" className="btn btn-soft btn-lg">طلبچ: {MARKET_ORDER_STATUS[l.my_order.status]}</Link>;
-  else if (l.status === 'reserved') cta = <button className="btn btn-soft btn-lg" disabled>محجوز لمشترية أخرى</button>;
+  else if (l.status === 'reserved') cta = <button className="btn btn-soft btn-lg" disabled>{l.shop ? 'نفدت الكمية' : 'محجوز لمشترية أخرى'}</button>;
   else if (l.status === 'sold') cta = <button className="btn btn-soft btn-lg" disabled>تم بيع هذا الفستان</button>;
   else if (canBuy) cta = <button className="btn btn-primary btn-lg" onClick={buy}>اطلبي الفستان الآن</button>;
 
@@ -137,7 +148,7 @@ export default function Listing() {
 
         <div className="product-info">
           <div className="m-crumbs">
-            <Link to="/market" className="crumb">سوق المستعمل</Link>
+            {l.shop ? <Link to={`/shop/${l.shop.slug}`} className="crumb">🏬 {l.shop.shop_name}</Link> : <Link to="/market?type=used" className="crumb">سوق المستعمل</Link>}
             {l.category_name && <><span>›</span><Link to={`/market?category=${l.category_slug}`} className="crumb">{l.category_name}</Link></>}
           </div>
           <h1>{l.title}</h1>
@@ -153,18 +164,33 @@ export default function Listing() {
           </div>
 
           <div className="m-specs">
-            <div><small>المقاس</small><b>{l.size}</b></div>
+            <div><small>{l.stock !== null ? 'المقاسات' : 'المقاس'}</small><b>{l.size}</b></div>
             <div><small>الحالة</small><b>{CONDITIONS[l.condition]?.label}</b></div>
             {l.brand && <div><small>الماركة</small><b>{l.brand}</b></div>}
             {l.color && <div><small>اللون</small><b>{l.color}</b></div>}
           </div>
           <p className="muted m-cond-hint">{CONDITIONS[l.condition]?.hint}</p>
+          {l.stock !== null && l.status === 'active' && l.stock <= 5 && <p className="stock-note">متبقي {l.stock} قطع فقط!</p>}
 
           <div className="desktop-actions">{cta}</div>
 
           {l.description && (<><h4>الوصف</h4><p className="desc m-desc">{l.description}</p></>)}
 
-          {s && (
+          {l.shop && (
+            <div className="m-shop">
+              <Link to={`/shop/${l.shop.slug}`} className="m-shop-top">
+                <img src={l.shop.logo_url} alt="" referrerPolicy="no-referrer" />
+                <div>
+                  <b>{l.shop.shop_name}</b>
+                  <VerifiedBadge />
+                  <small> 📍 {l.shop.city}{l.shop.address ? ` — ${l.shop.address}` : ''}</small>
+                </div>
+                <span className="m-link">المحل ←</span>
+              </Link>
+              <ShopContacts shop={l.shop} />
+            </div>
+          )}
+          {s && !l.shop && (
             <Link to={`/seller/${s.id}`} className="m-seller">
               <span className="review-avatar big">{s.name?.[0]}</span>
               <div>

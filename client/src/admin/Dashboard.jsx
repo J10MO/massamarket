@@ -121,6 +121,8 @@ export default function Dashboard() {
   const [days, setDays] = useState(30);
   const { data, error, loading } = useApi(`/admin/dashboard?days=${days}`);
   const market = useApi('/admin/market/stats');
+  const shops = useApi('/admin/merchants?status=pending');
+  const pendingShops = shops.data?.counts.pending || 0;
 
   if (error) return <p className="a-error">{error}</p>;
   if (!data) return <Loading />;
@@ -155,6 +157,16 @@ export default function Dashboard() {
             <p>{market.data.pending_listings} إعلان بانتظار المراجعة · {market.data.pending_promotions} طلب ترويج · {market.data.pending_commissions} دفعة عمولة بانتظار التأكيد</p>
           </div>
           <Link to={`/admin/market?tab=${market.data.pending_listings ? 'listings' : market.data.pending_promotions ? 'promotions' : 'commissions'}`} className="a-btn">مراجعة الآن</Link>
+        </div>
+      )}
+
+      {pendingShops > 0 && (
+        <div className="a-card a-alert-card">
+          <div>
+            <h3>🏬 طلبات انضمام محلات جديدة</h3>
+            <p>{pendingShops} محل بانتظار مراجعتچ وموافقتچ</p>
+          </div>
+          <Link to="/admin/merchants" className="a-btn">مراجعة الطلبات</Link>
         </div>
       )}
 

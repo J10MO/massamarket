@@ -10,6 +10,7 @@ import Customers from './Customers.jsx';
 import Pinterest from './Pinterest.jsx';
 import Settings from './Settings.jsx';
 import Market from './Market.jsx';
+import Merchants from './Merchants.jsx';
 import './admin.css';
 
 const NAV = [
@@ -18,6 +19,7 @@ const NAV = [
   { to: '/admin/products', label: 'الفساتين والمنتجات', icon: '👗' },
   { to: '/admin/categories', label: 'الأقسام', icon: '🗂' },
   { to: '/admin/market', label: 'سوق المستعمل', icon: '♻', badge: 'market' },
+  { to: '/admin/merchants', label: 'المحلات والتجار', icon: '🏬', badge: 'merchants' },
   { to: '/admin/customers', label: 'العملاء', icon: '👥' },
   { to: '/admin/pinterest', label: 'استيراد من Pinterest', icon: '📌' },
   { to: '/admin/settings', label: 'الإعدادات', icon: '⚙' },
@@ -72,6 +74,7 @@ export default function AdminApp() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(0);
   const [marketPending, setMarketPending] = useState(0);
+  const [shopsPending, setShopsPending] = useState(0);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -82,6 +85,7 @@ export default function AdminApp() {
     if (user?.role !== 'admin') return;
     const load = () => {
       api('/admin/orders?status=pending').then((d) => setPending(d.total)).catch(() => {});
+      api('/admin/merchants?status=pending').then((d) => setShopsPending(d.counts.pending || 0)).catch(() => {});
       api('/admin/market/stats').then((d) => setMarketPending(d.pending_listings + d.pending_promotions + d.pending_commissions)).catch(() => {});
     };
     load();
@@ -106,6 +110,7 @@ export default function AdminApp() {
               {n.label}
               {n.badge === 'pending' && pending > 0 && <span className="a-count">{pending}</span>}
               {n.badge === 'market' && marketPending > 0 && <span className="a-count">{marketPending}</span>}
+              {n.badge === 'merchants' && shopsPending > 0 && <span className="a-count">{shopsPending}</span>}
             </NavLink>
           ))}
         </nav>
@@ -134,6 +139,7 @@ export default function AdminApp() {
             <Route path="/admin/products" element={<Products />} />
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/market" element={<Market />} />
+            <Route path="/admin/merchants" element={<Merchants />} />
             <Route path="/admin/customers" element={<Customers />} />
             <Route path="/admin/pinterest" element={<Pinterest />} />
             <Route path="/admin/settings" element={<Settings />} />

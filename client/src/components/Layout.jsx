@@ -54,7 +54,8 @@ export function Header() {
             <NavLink to="/shop">المتجر</NavLink>
             <NavLink to="/shop?badge=sale">العروض</NavLink>
             <NavLink to="/shop?category=evening">السهرة</NavLink>
-            <NavLink to="/market">سوق المستعمل</NavLink>
+            <NavLink to="/market">السوق</NavLink>
+            <NavLink to="/shops">المحلات</NavLink>
             <NavLink to="/sell" className="nav-sell">+ بيعي فستانچ</NavLink>
           </nav>
           <form className="search" onSubmit={submit} role="search">
@@ -132,6 +133,8 @@ export function Footer() {
           <Link to="/shop?category=abaya">عبايات</Link>
           <Link to="/market">سوق المستعمل</Link>
           <Link to="/sell">بيعي فستانچ</Link>
+          <Link to="/shops">المحلات والبوتيكات</Link>
+          <Link to="/shops/join">سجّلي محلچ في جُمان</Link>
         </div>
         <div>
           <h4>المساعدة</h4>
