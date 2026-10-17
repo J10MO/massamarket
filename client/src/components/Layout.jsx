@@ -4,15 +4,15 @@ import { useStore } from '../store.jsx';
 import { BagIcon, HeartIcon, HomeIcon, InstagramIcon, RecycleIcon, SearchIcon, ShopIcon, UserIcon, WhatsappIcon } from './Icons.jsx';
 
 export const waLink = (n) => `https://wa.me/${String(n || '').replace(/\D/g, '')}`;
-export const igHandle = (url) => '@' + (String(url || '').match(/instagram\.com\/([^/?#]+)/)?.[1] || 'massa_desgin');
+export const igHandle = (url) => '@' + (String(url || '').match(/instagram\.com\/([^/?#]+)/)?.[1] || 'katkot__fashion');
 
 export function Logo({ light }) {
   return (
-    <Link to="/" className={`logo ${light ? 'light' : ''}`} aria-label="Massa — الصفحة الرئيسية">
-      <img src="/logo-mark.svg" alt="" width="40" height="40" />
+    <Link to="/" className={`logo ${light ? 'light' : ''}`} aria-label="Juman — الصفحة الرئيسية">
+      <img src="/logo-badge.png" alt="" width="44" height="44" />
       <span className="logo-words">
-        <b>Massa</b>
-        <small>ماسة</small>
+        <b>جُمان</b>
+        <small dir="ltr">JUMAN</small>
       </span>
     </Link>
   );
@@ -106,13 +106,13 @@ export function Footer() {
   const { settings } = useStore();
   return (
     <footer className="footer">
-      <img className="footer-emblem" src="/emblem.svg" alt="" aria-hidden="true" />
+      <img className="footer-emblem" src="/logo-face-gold.png" alt="" aria-hidden="true" />
       <div className="container footer-grid">
         <div>
           <Logo light />
           <p>{settings.tagline || 'فخامة تُحاكي ذوقچ'} — أناقة • تميّز • اختيار راقٍ. توصيل لجميع محافظات العراق والدفع عند الاستلام.</p>
           <div className="socials">
-            <a href={settings.instagram || 'https://www.instagram.com/massa_desgin/'} target="_blank" rel="noreferrer" aria-label="Instagram"><InstagramIcon /></a>
+            <a href={settings.instagram || 'https://www.instagram.com/katkot__fashion/'} target="_blank" rel="noreferrer" aria-label="Instagram"><InstagramIcon /></a>
             <a href={waLink(settings.whatsapp)} target="_blank" rel="noreferrer" aria-label="WhatsApp"><WhatsappIcon width="22" height="22" /></a>
           </div>
         </div>
@@ -133,7 +133,7 @@ export function Footer() {
           <span>📦 توصيل لجميع المحافظات</span>
         </div>
       </div>
-      <p className="copy">© {new Date().getFullYear()} Massa ماسة. جميع الحقوق محفوظة</p>
+      <p className="copy">© {new Date().getFullYear()} Juman جُمان. جميع الحقوق محفوظة</p>
     </footer>
   );
 }

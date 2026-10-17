@@ -78,7 +78,7 @@ export function Purchases() {
                     <b>البائعة: {o.seller_name}</b>
                     <span dir="ltr">{o.seller_phone}</span>
                     <div className="my-actions">
-                      <a className="wa" href={`${waLink(toIntl(o.seller_phone))}?text=${encodeURIComponent(`مرحباً، أنا ${o.buyer_name} طلبت "${o.title}" من سوق ماسة 🌸`)}`} target="_blank" rel="noreferrer">واتساب البائعة</a>
+                      <a className="wa" href={`${waLink(toIntl(o.seller_phone))}?text=${encodeURIComponent(`مرحباً، أنا ${o.buyer_name} طلبت "${o.title}" من سوق جُمان 🌸`)}`} target="_blank" rel="noreferrer">واتساب البائعة</a>
                       <a href={`tel:${o.seller_phone}`}>📞 اتصال</a>
                     </div>
                   </div>

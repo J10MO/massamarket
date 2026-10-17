@@ -29,7 +29,7 @@ function Hero({ categories, featured }) {
       <div className="hero-card">
         <div className="hero-text">
           {s.hero_offer && <p className="eyebrow"><span>✦</span> {s.hero_offer}</p>}
-          <h1>{s.hero_title || 'تألّقي كالماسة'}<br /><em>{s.hero_title_accent || 'في كل مناسبة'}</em></h1>
+          <h1>{s.hero_title || 'تألّقي كاللؤلؤ'}<br /><em>{s.hero_title_accent || 'في كل مناسبة'}</em></h1>
           <p className="hero-sub">{s.hero_subtitle || 'فساتين مختارة بعناية، خامات فاخرة ومقاسات تناسب الجميع.'}</p>
         </div>
         <div className="hero-media">
@@ -120,7 +120,7 @@ export default function Home() {
       <ul className="perks container">
         <li><TruckIcon /> <span>توصيل لكل المحافظات<br /><small>{settings.free_shipping_over ? `مجاني فوق ${price(settings.free_shipping_over)}` : 'لباب البيت'}</small></span></li>
         <li><span className="perk-cash">💵</span> <span>الدفع عند الاستلام<br /><small>آمن وسهل</small></span></li>
-        <li><ReturnIcon /> <span>استبدال مجاني<br /><small>خلال 7 أيام</small></span></li>
+        <li><ReturnIcon /> <span>إرجاع عند الاستلام<br /><small>إذا لم تطابق الصورة</small></span></li>
       </ul>
 
       {error && <p className="container alert">{error}</p>}
@@ -144,7 +144,7 @@ export default function Home() {
         <SectionTitle>تسوقي حسب القسم</SectionTitle>
         <div className="cat-tabs scroll-x" role="tablist">
           <button role="tab" aria-selected={active === 'all'} className={active === 'all' ? 'on' : ''} onClick={() => setActive('all')}>
-            <span className="cat-thumb all"><img src="/emblem.svg" alt="" /></span>الكل
+            <span className="cat-thumb all"><img src="/logo-face-gold.png" alt="" /></span>الكل
           </button>
           {categories.map((c) => (
             <button key={c.slug} role="tab" aria-selected={active === c.slug} className={active === c.slug ? 'on' : ''} onClick={() => setActive(c.slug)}>
@@ -177,7 +177,7 @@ export default function Home() {
         <section className="container section">
           <div className="used-band">
             <div>
-              <span className="m-tag">♻ جديد في ماسة</span>
+              <span className="m-tag">♻ جديد في جُمان</span>
               <h2>سوق المستعمل</h2>
               <p>فساتين لُبست مرة بأسعار تنافسية — أو بيعي فستانچ واستفيدي من سعره.</p>
             </div>
@@ -196,7 +196,7 @@ export default function Home() {
 
       {lookbook.length >= 6 && (
         <section className="container section">
-          <SectionTitle sub="إطلالات السهرة الأعلى تقييماً">لوك بوك ماسة</SectionTitle>
+          <SectionTitle sub="إطلالات السهرة الأعلى تقييماً">لوك بوك جُمان</SectionTitle>
           <div className="lookbook">
             {lookbook.slice(0, 6).map((p, i) => (
               <Link key={p.id} to={`/product/${p.id}`} className={`look look-${i}`}>
@@ -209,8 +209,8 @@ export default function Home() {
       )}
 
       <section className="container section promise">
-        <img src="/logo-mark.svg" alt="" className="promise-mark" />
-        <h2>وعد ماسة</h2>
+        <img src="/logo-badge.png" alt="" className="promise-mark" />
+        <h2>وعد جُمان</h2>
         <p>نختار كل قطعة بعناية لتصلك بجودة تليق بكِ. إن لم تكوني راضية تماماً، نستبدلها لكِ مجاناً.</p>
         <div className="promise-stats">
           <div><b>+12 ألف</b><small>عميلة سعيدة</small></div>
@@ -240,7 +240,7 @@ export default function Home() {
       </section>
 
       <section className="container section">
-        <a className="insta-band" href={settings.instagram || 'https://www.instagram.com/massa_desgin/'} target="_blank" rel="noreferrer">
+        <a className="insta-band" href={settings.instagram || 'https://www.instagram.com/katkot__fashion/'} target="_blank" rel="noreferrer">
           <span className="insta-icon"><InstagramIcon width="28" height="28" /></span>
           <span className="insta-text">
             <b>تابعينا على إنستغرام</b>

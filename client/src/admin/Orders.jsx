@@ -16,16 +16,16 @@ function printInvoice(o, store) {
   if (!w) return;
   const rows = o.items.map((i) => `<tr><td>${i.name}${i.size ? ` (${i.size})` : ''}</td><td>${i.quantity}</td><td>${price(i.price)}</td><td>${price(i.price * i.quantity)}</td></tr>`).join('');
   w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>فاتورة #${o.id}</title>
-  <style>body{font-family:Tahoma,Arial;padding:28px;color:#1a1f36}h1{margin:0;color:#0b1a3e}table{width:100%;border-collapse:collapse;margin:18px 0}
+  <style>body{font-family:Tahoma,Arial;padding:28px;color:#2b1b2a}h1{margin:0;color:#4a1d3f}table{width:100%;border-collapse:collapse;margin:18px 0}
   td,th{border-bottom:1px solid #ddd;padding:8px;text-align:right}.top{display:flex;justify-content:space-between;align-items:center}
   .tot td{font-weight:bold;border:0}img{width:70px;height:70px}</style></head><body>
-  <div class="top"><div><h1>${store.store_name || 'Massa'}</h1><p>فاتورة طلب #${o.id}<br>${fmtDate(o.created_at, true)}</p></div><img src="/logo-mark.svg"></div>
+  <div class="top"><div><h1>${store.store_name || 'Juman'}</h1><p>فاتورة طلب #${o.id}<br>${fmtDate(o.created_at, true)}</p></div><img src="/logo-badge.png"></div>
   <p><b>${o.customer_name}</b><br>${o.phone}<br>${o.city} — ${o.address}${o.notes ? `<br>ملاحظة: ${o.notes}` : ''}</p>
   <table><thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr class="tot"><td colspan="3">المجموع الفرعي</td><td>${price(o.subtotal)}</td></tr>
   <tr class="tot"><td colspan="3">التوصيل</td><td>${o.shipping ? price(o.shipping) : 'مجاني'}</td></tr>
   <tr class="tot"><td colspan="3">الإجمالي (الدفع عند الاستلام)</td><td>${price(o.total)}</td></tr></tfoot></table>
-  <p style="text-align:center">شكراً لتسوقك من ماسة 💎</p><script>onload=()=>print()</script></body></html>`);
+  <p style="text-align:center">شكراً لتسوقك من جُمان 💎</p><script>onload=()=>print()</script></body></html>`);
   w.document.close();
 }
 
@@ -52,7 +52,7 @@ function OrderDetail({ id, onClose, onChanged }) {
     onClose();
   };
 
-  const waMsg = o && encodeURIComponent(`مرحباً ${o.customer_name} 🌸\nمعك متجر ماسة بخصوص طلبك رقم #${o.id} بقيمة ${price(o.total)}.\nنود تأكيد الطلب والعنوان: ${o.city} - ${o.address}`);
+  const waMsg = o && encodeURIComponent(`مرحباً ${o.customer_name} 🌸\nمعك متجر جُمان بخصوص طلبك رقم #${o.id} بقيمة ${price(o.total)}.\nنود تأكيد الطلب والعنوان: ${o.city} - ${o.address}`);
 
   return (
     <Modal title={`الطلب #${id}`} onClose={onClose} wide>

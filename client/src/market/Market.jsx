@@ -71,7 +71,7 @@ export default function Market() {
     <div className="container market">
       <section className="m-hero">
         <div>
-          <span className="m-tag">♻ سوق ماسة للمستعمل</span>
+          <span className="m-tag">♻ سوق جُمان للمستعمل</span>
           <h1>فساتين بحالة ممتازة<br /><em>بأسعار تنافسية</em></h1>
           <p>اشتري من بنات بلدچ مباشرة، أو بيعي فستانچ اللي لبستيه مرة وحدة واستفيدي من سعره.</p>
           <div className="m-hero-actions">

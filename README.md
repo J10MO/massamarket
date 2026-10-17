@@ -1,4 +1,4 @@
-# Massa ماسة — متجر فساتين نسائية
+# Juman جُمان — متجر فساتين نسائية
 
 React (Vite) + Node.js (Express) + PostgreSQL. Arabic RTL, mobile-first. Product images come from public Pinterest boards.
 

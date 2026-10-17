@@ -207,7 +207,7 @@ function Sales({ onCount }) {
   return (
     <ul className="my-list">
       {items.map((o) => {
-        const msg = encodeURIComponent(`مرحباً ${o.buyer_name} 🌸 معچ البائعة من سوق ماسة بخصوص طلبچ "${o.title}" بسعر ${price(o.price)}. متى يناسبچ الاستلام؟`);
+        const msg = encodeURIComponent(`مرحباً ${o.buyer_name} 🌸 معچ البائعة من سوق جُمان بخصوص طلبچ "${o.title}" بسعر ${price(o.price)}. متى يناسبچ الاستلام؟`);
         return (
           <li key={o.id} className="my-item order">
             <img className="my-thumb" src={o.image_url} alt="" referrerPolicy="no-referrer" />

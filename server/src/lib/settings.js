@@ -2,19 +2,19 @@ import { query } from '../db.js';
 
 // Store-wide settings, editable from the admin dashboard. Defaults are for Iraq.
 export const DEFAULT_SETTINGS = {
-  store_name: 'Massa ماسة',
-  tagline: 'فخامة تُحاكي ذوقچ',
+  store_name: 'Juman جُمان',
+  tagline: 'فساتين نسائية بأناقة اللؤلؤ',
   currency: 'د.ع',
   shipping_fee: 5000,
   free_shipping_over: 150000,
   whatsapp: '9647700000000',
-  instagram: 'https://www.instagram.com/massa_desgin/',
+  instagram: 'https://www.instagram.com/katkot__fashion/',
   phone: '',
   hero_offer: 'عرض حصري: خصم 20% هذا الأسبوع',
-  hero_title: 'تألّقي كالماسة',
+  hero_title: 'تألّقي كاللؤلؤ',
   hero_title_accent: 'في كل مناسبة',
   hero_subtitle: 'أناقة • تميّز • اختيار راقٍ — لأنچ تستحقين الأجمل دائماً.',
-  announcements: ['📦 توصيل لجميع المحافظات', 'الدفع عند الاستلام ✦', 'استبدال مجاني خلال 7 أيام ✦'],
+  announcements: ['📦 توصيل لجميع المحافظات', 'الدفع عند الاستلام ✦', 'إرجاع القطعة بوجود المندوب إذا لم تطابق الصورة ✦'],
   // Used-dress marketplace
   market_enabled: true,
   market_auto_approve: false, // false = admin reviews every new listing

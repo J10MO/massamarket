@@ -126,7 +126,7 @@ export default function Product() {
           <ul className="perks small">
             <li><TruckIcon /> توصيل خلال 2-5 أيام عمل</li>
             <li><span className="perk-cash">💵</span> الدفع عند الاستلام</li>
-            <li><ReturnIcon /> استبدال مجاني خلال 7 أيام</li>
+            <li><ReturnIcon /> يحق لكِ إرجاع القطعة بوجود المندوب إذا لم تطابق الصورة</li>
           </ul>
           {p.source_url && (
             <a className="source" href={p.source_url} target="_blank" rel="noreferrer">مصدر الصورة: Pinterest</a>

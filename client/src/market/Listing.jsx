@@ -113,7 +113,7 @@ export default function Listing() {
   const s = l.seller;
   const canBuy = l.status === 'active' && !l.is_owner;
   const buy = () => (user ? setSheet('order') : navigate(`/account?next=/market/${l.id}`));
-  const shareText = encodeURIComponent(`${l.title} — ${price(l.price)} على سوق ماسة للمستعمل\n${window.location.href}`);
+  const shareText = encodeURIComponent(`${l.title} — ${price(l.price)} على سوق جُمان للمستعمل\n${window.location.href}`);
 
   let cta;
   if (l.is_owner) cta = <Link to="/my/listings" className="btn btn-outline btn-lg">إدارة إعلانچ</Link>;

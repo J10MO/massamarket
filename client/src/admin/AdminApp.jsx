@@ -47,8 +47,8 @@ function AdminLogin() {
   return (
     <div className="a-login">
       <form className="a-login-card" onSubmit={submit}>
-        <img src="/logo-mark.svg" alt="" width="84" height="84" />
-        <h1>لوحة تحكم ماسة</h1>
+        <img src="/logo-badge.png" alt="" width="84" height="84" />
+        <h1>لوحة تحكم جُمان</h1>
         <p>سجّلي الدخول بحساب المدير</p>
         {user && user.role !== 'admin' && (
           <p className="a-error">
@@ -75,7 +75,7 @@ export default function AdminApp() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    document.title = 'لوحة التحكم — Massa';
+    document.title = 'لوحة التحكم — Juman';
   }, []);
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -96,8 +96,8 @@ export default function AdminApp() {
     <div className="a-app">
       <aside className={`a-side ${open ? 'open' : ''}`}>
         <div className="a-brand">
-          <img src="/logo-mark.svg" alt="" width="42" height="42" />
-          <div><b>Massa</b><small>لوحة التحكم</small></div>
+          <img src="/logo-badge.png" alt="" width="42" height="42" />
+          <div><b>جُمان</b><small>لوحة التحكم</small></div>
         </div>
         <nav>
           {NAV.map((n) => (
@@ -123,8 +123,8 @@ export default function AdminApp() {
       <div className="a-main">
         <header className="a-top">
           <button className="a-icon" onClick={() => setOpen(true)} aria-label="القائمة">☰</button>
-          <img src="/logo-mark.svg" alt="" width="32" height="32" />
-          <b>لوحة تحكم ماسة</b>
+          <img src="/logo-badge.png" alt="" width="32" height="32" />
+          <b>لوحة تحكم جُمان</b>
           {pending > 0 && <NavLink to="/admin/orders" className="a-count">{pending} طلب جديد</NavLink>}
         </header>
         <main className="a-content">

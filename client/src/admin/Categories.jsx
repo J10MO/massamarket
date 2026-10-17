@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { Empty, ImagePicker, Loading, Modal, PageHead, Tags, useApi, useNotify } from './ui.jsx';
 
-const PALETTE = ['#0B1A3E', '#A8627D', '#9C8064', '#4A3B4F', '#7E5F7A', '#2F5D62', '#8C3B4A', '#5B6B8C'];
+const PALETTE = ['#4A1D3F', '#B04A76', '#9A6370', '#6B3A5B', '#8A4F7D', '#A0405A', '#7A5C8E', '#5E2A52'];
 
 function CategoryForm({ cat, count, onClose, onSaved }) {
   const notify = useNotify();
