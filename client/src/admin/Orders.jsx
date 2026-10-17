@@ -11,6 +11,9 @@ const toIntl = (phone) => {
   return d.startsWith('0') ? `964${d.slice(1)}` : d;
 };
 
+const PAY = { awaiting: ['⏳ بانتظار تأكيد الدفع', 'st-pending'], paid: ['✓ مدفوع إلكترونياً', 'st-delivered'], rejected: ['✕ لم يصل التحويل', 'st-cancelled'] };
+const PayPill = ({ status }) => (PAY[status] ? <span className={`a-pill a-block-pill ${PAY[status][1]}`}>{PAY[status][0]}</span> : null);
+
 function printInvoice(o, store) {
   const w = window.open('', '_blank', 'width=720,height=900');
   if (!w) return;
@@ -24,7 +27,7 @@ function printInvoice(o, store) {
   <table><thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr class="tot"><td colspan="3">المجموع الفرعي</td><td>${price(o.subtotal)}</td></tr>
   <tr class="tot"><td colspan="3">التوصيل</td><td>${o.shipping ? price(o.shipping) : 'مجاني'}</td></tr>
-  <tr class="tot"><td colspan="3">الإجمالي (الدفع عند الاستلام)</td><td>${price(o.total)}</td></tr></tfoot></table>
+  <tr class="tot"><td colspan="3">الإجمالي (${o.payment_status === 'cod' ? 'الدفع عند الاستلام' : o.payment_method + (o.payment_status === 'paid' ? ' — مدفوع' : '')})</td><td>${price(o.total)}</td></tr></tfoot></table>
   <p style="text-align:center">شكراً لتسوقك من جُمان 💎</p><script>onload=()=>print()</script></body></html>`);
   w.document.close();
 }
@@ -40,6 +43,17 @@ function OrderDetail({ id, onClose, onChanged }) {
       setData((d) => ({ ...d, ...updated }));
       onChanged();
       notify(`تم تغيير الحالة إلى: ${ORDER_STATUS[status]}`);
+    } catch (e) {
+      notify(e.message);
+    }
+  };
+  const setPayment = async (action) => {
+    if (action === 'confirm' && !confirm(`تأكيد وصول ${price(o.total)} عبر ${o.payment_method}؟`)) return;
+    try {
+      const updated = await api(`/admin/orders/${id}/payment`, { method: 'POST', body: { action } });
+      setData((d) => ({ ...d, ...updated }));
+      onChanged();
+      notify(action === 'confirm' ? 'تم تأكيد الدفع' : 'تم تسجيل أن التحويل لم يصل');
     } catch (e) {
       notify(e.message);
     }
@@ -87,7 +101,18 @@ function OrderDetail({ id, onClose, onChanged }) {
               <p className="a-sum"><span>المجموع الفرعي</span><span>{price(o.subtotal)}</span></p>
               <p className="a-sum"><span>التوصيل</span><span>{o.shipping ? price(o.shipping) : 'مجاني'}</span></p>
               <p className="a-sum total"><span>الإجمالي</span><span>{price(o.total)}</span></p>
-              <p className="a-muted">الدفع: عند الاستلام</p>
+              {o.payment_status === 'cod' ? <p className="a-muted">الدفع: عند الاستلام</p> : (
+                <div className={`a-paybox pay-${o.payment_status}`}>
+                  <p><b>💳 دفع إلكتروني — {o.payment_method}</b></p>
+                  {o.payment_ref && <p>رقم العملية: <b dir="ltr">{o.payment_ref}</b></p>}
+                  {o.payment_receipt && <a className="a-link" href={o.payment_receipt} target="_blank" rel="noreferrer">🧾 عرض الإيصال</a>}
+                  <PayPill status={o.payment_status} />
+                  <div className="a-row">
+                    {o.payment_status !== 'paid' && <button className="a-btn primary sm" onClick={() => setPayment('confirm')}>✓ وصل المبلغ</button>}
+                    {o.payment_status !== 'rejected' && <button className="a-btn danger sm" onClick={() => setPayment('reject')}>لم يصل</button>}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -170,7 +195,7 @@ export default function Orders() {
                     </td>
                     <td className="a-hide-sm">{fmtDate(o.created_at, true)}</td>
                     <td><b>{price(o.total)}</b></td>
-                    <td><StatusPill status={o.status} /></td>
+                    <td><StatusPill status={o.status} />{o.payment_status !== 'cod' && <PayPill status={o.payment_status} />}</td>
                   </tr>
                 ))}
               </tbody>

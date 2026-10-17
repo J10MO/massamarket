@@ -142,19 +142,19 @@ export default function Dashboard() {
       <div className="a-kpis">
         <Kpi label={`المبيعات (${days} يوم)`} value={price(k.revenue)} sub={`اليوم: ${price(k.revenue_today)}`} />
         <Kpi label="الطلبات" value={k.orders} sub={`اليوم: ${k.orders_today}`} to="/admin/orders" />
-        <Kpi label="بانتظار المراجعة" value={k.pending} sub="تحتاج تأكيد" to="/admin/orders" />
+        <Kpi label="بانتظار المراجعة" value={k.pending} sub={k.awaiting_payment ? `${k.awaiting_payment} دفع إلكتروني للتأكيد` : 'تحتاج تأكيد'} to="/admin/orders" />
         <Kpi label="متوسط قيمة الطلب" value={price(k.avg_order)} sub={`${k.buyers} مشترية`} />
         <Kpi label="المنتجات المعروضة" value={k.products} sub={`${k.hidden} مخفي · ${k.categories} أقسام`} to="/admin/products" />
         <Kpi label="الحسابات المسجلة" value={k.users} sub="عميلات" to="/admin/customers" />
       </div>
 
-      {market.data && (market.data.pending_listings > 0 || market.data.pending_promotions > 0) && (
+      {market.data && (market.data.pending_listings > 0 || market.data.pending_promotions > 0 || market.data.pending_commissions > 0) && (
         <div className="a-card a-alert-card">
           <div>
             <h3>♻ سوق المستعمل يحتاج انتباهچ</h3>
-            <p>{market.data.pending_listings} إعلان بانتظار المراجعة · {market.data.pending_promotions} طلب ترويج بانتظار تأكيد الدفع</p>
+            <p>{market.data.pending_listings} إعلان بانتظار المراجعة · {market.data.pending_promotions} طلب ترويج · {market.data.pending_commissions} دفعة عمولة بانتظار التأكيد</p>
           </div>
-          <Link to={`/admin/market?tab=${market.data.pending_listings ? 'listings' : 'promotions'}`} className="a-btn">مراجعة الآن</Link>
+          <Link to={`/admin/market?tab=${market.data.pending_listings ? 'listings' : market.data.pending_promotions ? 'promotions' : 'commissions'}`} className="a-btn">مراجعة الآن</Link>
         </div>
       )}
 

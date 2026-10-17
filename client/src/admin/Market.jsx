@@ -251,6 +251,91 @@ function Orders() {
   );
 }
 
+function Commissions() {
+  const notify = useNotify();
+  const [status, setStatus] = useState('pending');
+  const { data, loading, reload } = useApi(`/admin/market/commissions?status=${status}`);
+  const decide = async (p, action) => {
+    let note = '';
+    if (action === 'reject') {
+      note = prompt('سبب الرفض (يظهر للبائعة):', 'لم يصل المبلغ');
+      if (!note) return;
+    } else if (!confirm(`تأكيد وصول ${price(p.amount)} من ${p.seller_name}؟`)) return;
+    try {
+      await api(`/admin/market/commissions/${p.id}`, { method: 'POST', body: { action, note } });
+      notify(action === 'approve' ? 'تم تأكيد استلام العمولة' : 'تم رفض الدفعة');
+      reload();
+    } catch (e) {
+      notify(e.message);
+    }
+  };
+  return (
+    <>
+      <div className="a-tabs">
+        {[['pending', 'بانتظار التأكيد'], ['approved', 'مستلمة'], ['rejected', 'مرفوضة'], ['', 'الكل']].map(([k, l]) => (
+          <button key={k} className={status === k ? 'on' : ''} onClick={() => setStatus(k)}>{l}</button>
+        ))}
+      </div>
+      {loading && !data ? <Loading /> : (
+        <>
+          {!data.payments.length ? <Empty>لا توجد دفعات هنا</Empty> : (
+            <div className="a-card flush">
+              <div className="a-table-wrap">
+                <table className="a-table">
+                  <thead><tr><th>البائعة</th><th>المبلغ</th><th>الدفع</th><th className="a-hide-sm">التاريخ</th><th>الحالة</th></tr></thead>
+                  <tbody>
+                    {data.payments.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.seller_name}<small className="a-block" dir="ltr">{p.seller_phone}</small></td>
+                        <td><b>{price(p.amount)}</b><small className="a-block">{p.order_ids.length} بيع</small></td>
+                        <td>
+                          {p.payment_method}
+                          {p.payment_ref && <small className="a-block" dir="ltr">#{p.payment_ref}</small>}
+                          {p.receipt_url && <a className="a-link" href={p.receipt_url} target="_blank" rel="noreferrer">🧾 الإيصال</a>}
+                        </td>
+                        <td className="a-hide-sm">{fmtDate(p.created_at, true)}</td>
+                        <td>
+                          {p.status === 'pending' ? (
+                            <div className="a-row">
+                              <button className="a-btn primary sm" onClick={() => decide(p, 'approve')}>✓ وصل</button>
+                              <button className="a-btn danger sm" onClick={() => decide(p, 'reject')}>لم يصل</button>
+                            </div>
+                          ) : p.status === 'approved' ? <span className="a-pill st-delivered">مستلمة</span>
+                            : <span className="a-pill st-cancelled" title={p.admin_note}>مرفوضة</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {data.debtors.length > 0 && (
+            <div className="a-card">
+              <div className="a-card-head"><h3>عمولات لم تُدفع بعد</h3><span className="a-muted">{data.debtors.length} بائعة</span></div>
+              <ul className="a-list">
+                {data.debtors.map((d) => (
+                  <li key={d.id}>
+                    <span className="a-avatar">{d.name?.[0]}</span>
+                    <div><b>{d.name}</b><small dir="ltr">{d.phone || '—'}</small></div>
+                    <b>{price(d.due)}</b>
+                    {d.phone && (
+                      <a className="a-btn wa sm" target="_blank" rel="noreferrer"
+                        href={`${waLink(toIntl(d.phone))}?text=${encodeURIComponent(`مرحباً ${d.name} 🌸 عليچ عمولة مبيعات بقيمة ${price(d.due)} في سوق جُمان. تقدرين تسددينها من مركز البائعة عبر الدفع الإلكتروني. شكراً لچ!`)}`}>
+                        تذكير
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
 function Reports() {
   const notify = useNotify();
   const { data, loading, reload } = useApi('/admin/market/reports');
@@ -285,6 +370,7 @@ export default function Market() {
   const TABS = [
     ['listings', 'الإعلانات', s?.pending_listings],
     ['promotions', 'الإعلانات المدفوعة', s?.pending_promotions],
+    ['commissions', 'العمولات', s?.pending_commissions],
     ['orders', 'طلبات البيع', s?.open_orders],
     ['reports', 'البلاغات', s?.open_reports],
   ];
@@ -297,7 +383,7 @@ export default function Market() {
           <div className="a-kpi"><small>ترويج بانتظار الدفع</small><b>{s.pending_promotions}</b><span>{s.boosted_now} مميز الآن</span></div>
           <div className="a-kpi"><small>إيرادات الإعلانات</small><b>{price(s.ads_revenue)}</b><span>مؤكدة</span></div>
           <div className="a-kpi"><small>مبيعات مكتملة</small><b>{s.completed_orders}</b><span>{price(s.gmv)}</span></div>
-          <div className="a-kpi"><small>العمولات</small><b>{price(s.commission)}</b><span>من المبيعات المكتملة</span></div>
+          <div className="a-kpi"><small>العمولات المستلمة</small><b>{price(s.commission_collected)}</b><span>مستحقة: {price(s.commission_due)}</span></div>
           <div className="a-kpi"><small>بلاغات مفتوحة</small><b>{s.open_reports}</b><span>{s.open_orders} طلب جارٍ</span></div>
         </div>
       )}
@@ -310,6 +396,7 @@ export default function Market() {
       </div>
       {tab === 'listings' && <Listings />}
       {tab === 'promotions' && <Promotions />}
+      {tab === 'commissions' && <Commissions />}
       {tab === 'orders' && <Orders />}
       {tab === 'reports' && <Reports />}
     </>

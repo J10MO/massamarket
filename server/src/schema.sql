@@ -161,3 +161,23 @@ CREATE TABLE IF NOT EXISTS listing_reports (
   status     TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'resolved')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- v4: online payment (manual transfer, e.g. Super Qi) for store orders + marketplace commission collection
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'cod'; -- cod | awaiting | paid | rejected
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_ref TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_receipt TEXT;
+
+ALTER TABLE market_orders ADD COLUMN IF NOT EXISTS commission_status TEXT NOT NULL DEFAULT 'unpaid'; -- unpaid | pending | paid
+
+CREATE TABLE IF NOT EXISTS commission_payments (
+  id             SERIAL PRIMARY KEY,
+  seller_id      INT REFERENCES users(id) ON DELETE SET NULL,
+  amount         NUMERIC(12,2) NOT NULL,
+  order_ids      INT[] NOT NULL,
+  payment_method TEXT NOT NULL,
+  payment_ref    TEXT,
+  receipt_url    TEXT,
+  status         TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  admin_note     TEXT,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);

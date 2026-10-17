@@ -59,6 +59,7 @@ export default function Settings() {
           shipping_fee: Number(form.shipping_fee) || 0,
           free_shipping_over: Number(form.free_shipping_over) || 0,
           market_commission: Number(form.market_commission) || 0,
+          commission_limit: Number(form.commission_limit) || 0,
           boost_plans: (form.boost_plans || []).filter((p) => p.days > 0 && p.price >= 0).sort((a, b) => a.days - b.days),
           payment_methods: (form.payment_methods || []).filter((m) => m.name.trim()),
         },
@@ -103,9 +104,11 @@ export default function Settings() {
           <section className="a-fields">
             <div className="a-switches span-2">
               <label className="a-switch"><input type="checkbox" checked={form.market_enabled !== false} onChange={(e) => set('market_enabled')(e.target.checked)} /><span />تفعيل سوق المستعمل</label>
+              <label className="a-switch"><input type="checkbox" checked={form.online_payment_enabled !== false} onChange={(e) => set('online_payment_enabled')(e.target.checked)} /><span />السماح بالدفع الإلكتروني في المتجر</label>
               <label className="a-switch"><input type="checkbox" checked={!!form.market_auto_approve} onChange={(e) => set('market_auto_approve')(e.target.checked)} /><span />نشر الإعلانات مباشرة بدون مراجعة</label>
             </div>
             <label>عمولة الموقع من كل بيع (%)<input className="a-input" type="number" min="0" max="50" step="0.5" value={form.market_commission} onChange={set('market_commission')} /></label>
+            <label>إيقاف النشر إذا تجاوزت العمولة غير المدفوعة <small className="a-muted">(د.ع — 0 بدون حد)</small><input className="a-input" type="number" min="0" step="1000" value={form.commission_limit} onChange={set('commission_limit')} /></label>
             <label className="span-2">شروط البيع (تظهر للبائعة)<textarea className="a-input" rows="2" value={form.market_terms} onChange={set('market_terms')} /></label>
           </section>
 
@@ -119,7 +122,7 @@ export default function Settings() {
           ))}
           <button type="button" className="a-btn sm" onClick={() => set('boost_plans')([...(form.boost_plans || []), { days: 7, price: 5000 }])}>+ باقة</button>
 
-          <h4 className="a-sub">طرق الدفع للترويج</h4>
+          <h4 className="a-sub">حسابات الدفع الإلكتروني <small className="a-muted">(للترويج، العمولات، والدفع في المتجر)</small></h4>
           {(form.payment_methods || []).map((m, i) => (
             <div key={i} className="a-plan-row pay">
               <label>الاسم<input className="a-input" value={m.name} onChange={(e) => set('payment_methods')(form.payment_methods.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} /></label>

@@ -98,6 +98,9 @@ export default function Account() {
           <div className="order-head">
             <b>طلب #{o.id}</b>
             <span className={`status st-${o.status}`}>{ORDER_STATUS[o.status]}</span>
+            {o.payment_status === 'awaiting' && <span className="status st-pending">⏳ بانتظار تأكيد الدفع</span>}
+            {o.payment_status === 'paid' && <span className="status st-delivered">✓ مدفوع</span>}
+            {o.payment_status === 'rejected' && <span className="status st-cancelled">لم يصل التحويل</span>}
           </div>
           <div className="order-thumbs">
             {o.items.map((i) => <Img key={i.id} src={i.image_url} alt={i.name} />)}

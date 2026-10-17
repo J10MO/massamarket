@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
-import { api, price, uploadImages } from '../api.js';
+import { api, price } from '../api.js';
 import { useStore } from '../store.jsx';
 import { waLink } from '../components/Layout.jsx';
+import PaymentBox, { paymentReady } from '../components/PaymentBox.jsx';
 import { CloseIcon } from '../components/Icons.jsx';
 import { LISTING_STATUS, MARKET_ORDER_STATUS, timeAgo } from './shared.jsx';
 
@@ -11,35 +12,82 @@ export const toIntl = (phone) => {
   return d.startsWith('0') ? `964${d.slice(1)}` : d;
 };
 
-function BoostSheet({ listing, onClose, onDone }) {
+const firstMethod = (settings) => settings.payment_methods?.[0]?.name || '';
+
+function CommissionSheet({ due, onClose, onDone }) {
   const { settings, notify } = useStore();
-  const plans = settings.boost_plans || [];
-  const methods = settings.payment_methods || [];
-  const [days, setDays] = useState(plans[1]?.days || plans[0]?.days);
-  const [method, setMethod] = useState(methods[0]?.name || '');
-  const [ref, setRef] = useState('');
-  const [receipt, setReceipt] = useState('');
+  const [pay, setPay] = useState({ method: firstMethod(settings), ref: '', receipt: '' });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const plan = plans.find((p) => Number(p.days) === Number(days));
-  const m = methods.find((x) => x.name === method);
-
-  const upload = async (file) => {
-    if (!file) return;
+  const submit = async () => {
     setBusy(true);
+    setError('');
     try {
-      setReceipt((await uploadImages([file], '/api/market/uploads'))[0]);
+      await api('/market/commissions/pay', { method: 'POST', body: { payment_method: pay.method, payment_ref: pay.ref, receipt_url: pay.receipt } });
+      notify('تم إرسال الدفعة — شكراً لچ 💕');
+      onDone();
     } catch (e) {
       setError(e.message);
     } finally {
       setBusy(false);
     }
   };
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="تسديد العمولة">
+        <div className="sheet-head">
+          <h3>تسديد عمولة الموقع</h3>
+          <button className="icon-btn" onClick={onClose} aria-label="إغلاق"><CloseIcon /></button>
+        </div>
+        <p className="muted">عمولة الموقع {settings.market_commission}% من مبيعاتچ المكتملة. المبلغ المستحق حالياً:</p>
+        <p className="commission-due">{price(due)}</p>
+        <PaymentBox amount={due} value={pay} onChange={setPay} />
+        {error && <p className="alert">{error}</p>}
+        <button className="btn btn-primary btn-lg btn-block" disabled={busy || !paymentReady(pay)} onClick={submit}>إرسال الدفعة — {price(due)}</button>
+      </div>
+    </div>
+  );
+}
+
+function CommissionBanner({ sum, onPaid }) {
+  const { settings } = useStore();
+  const [open, setOpen] = useState(false);
+  const due = Number(sum?.commission_due) || 0;
+  const pending = Number(sum?.commission_pending) || 0;
+  const limit = Number(settings.commission_limit) || 0;
+  if (!due && !pending) return null;
+  return (
+    <>
+      <div className={`commission-banner ${limit && due > limit ? 'blocked' : ''}`}>
+        <div>
+          {due > 0 ? <b>عمولة مستحقة: {price(due)}</b> : <b>⏳ دفعة عمولة بانتظار التأكيد: {price(pending)}</b>}
+          <small>
+            {due > 0 && limit > 0 && due > limit
+              ? 'تجاوزتِ الحد المسموح — سدّدي العمولة لتتمكني من نشر إعلانات جديدة.'
+              : due > 0 ? 'سدّديها إلكترونياً بخطوة وحدة.' : 'سنؤكدها فور وصول التحويل.'}
+          </small>
+        </div>
+        {due > 0 && <button className="btn btn-rose" onClick={() => setOpen(true)}>ادفعي الآن</button>}
+      </div>
+      {open && <CommissionSheet due={due} onClose={() => setOpen(false)} onDone={() => { setOpen(false); onPaid(); }} />}
+    </>
+  );
+}
+
+function BoostSheet({ listing, onClose, onDone }) {
+  const { settings, notify } = useStore();
+  const plans = settings.boost_plans || [];
+  const [days, setDays] = useState(plans[1]?.days || plans[0]?.days);
+  const [pay, setPay] = useState({ method: firstMethod(settings), ref: '', receipt: '' });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const plan = plans.find((p) => Number(p.days) === Number(days));
+
   const submit = async () => {
     setBusy(true);
     setError('');
     try {
-      await api(`/market/listings/${listing.id}/promote`, { method: 'POST', body: { days, payment_method: method, payment_ref: ref, receipt_url: receipt } });
+      await api(`/market/listings/${listing.id}/promote`, { method: 'POST', body: { days, payment_method: pay.method, payment_ref: pay.ref, receipt_url: pay.receipt } });
       notify('تم إرسال طلب الترويج — سيتفعّل بعد تأكيد الدفع');
       onDone();
     } catch (e) {
@@ -70,26 +118,10 @@ function BoostSheet({ listing, onClose, onDone }) {
           ))}
         </div>
 
-        <h4>2. ادفعي عبر</h4>
-        <div className="chips wrap">
-          {methods.map((x) => <button key={x.name} className={method === x.name ? 'on' : ''} onClick={() => setMethod(x.name)}>{x.name}</button>)}
-        </div>
-        {m && plan && (
-          <div className="pay-box">
-            حوّلي <b>{price(plan.price)}</b> إلى {m.name}:
-            <span className="pay-acc" dir="ltr">{m.details}</span>
-            <button className="m-link" onClick={() => { navigator.clipboard?.writeText(m.details); notify('تم نسخ الرقم'); }}>نسخ</button>
-          </div>
-        )}
-
-        <h4>3. أرسلي إثبات الدفع</h4>
-        <input className="m-select" dir="ltr" placeholder="رقم العملية / Transaction ID" value={ref} onChange={(e) => setRef(e.target.value)} />
-        <label className="receipt-up">
-          <input type="file" accept="image/*" hidden onChange={(e) => upload(e.target.files[0])} />
-          {receipt ? <><img src={receipt} alt="" /> تم رفع الإيصال ✓ (اضغطي للتغيير)</> : busy ? 'جارٍ الرفع...' : '📎 أو ارفعي صورة الإيصال'}
-        </label>
+        <h4>2. ادفعي إلكترونياً</h4>
+        <PaymentBox amount={plan?.price} value={pay} onChange={setPay} />
         {error && <p className="alert">{error}</p>}
-        <button className="btn btn-primary btn-lg btn-block" disabled={busy || (!ref && !receipt)} onClick={submit}>
+        <button className="btn btn-primary btn-lg btn-block" disabled={busy || !paymentReady(pay)} onClick={submit}>
           إرسال طلب الترويج {plan && `— ${price(plan.price)}`}
         </button>
         <p className="muted center-text">تتم مراجعة الدفع عادةً خلال ساعات، ويبدأ الترويج فور التأكيد.</p>
@@ -273,6 +305,7 @@ export default function SellerCenter() {
           <div><b>{price(sum.earned)}</b><small>أرباحچ</small></div>
         </div>
       )}
+      <CommissionBanner sum={sum} onPaid={loadSum} />
       <div className="seg">
         <button className={tab === 'listings' ? 'on' : ''} onClick={() => setParams({ tab: 'listings' })}>إعلاناتي {sum ? `(${sum.listings})` : ''}</button>
         <button className={tab === 'sales' ? 'on' : ''} onClick={() => setParams({ tab: 'sales' })}>

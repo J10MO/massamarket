@@ -21,6 +21,7 @@ router.get('/dashboard', async (req, res) => {
       count(*) FILTER (WHERE created_at >= date_trunc('day', now()))::int AS orders_today,
       COALESCE(sum(total) FILTER (WHERE status <> 'cancelled' AND created_at >= date_trunc('day', now())), 0) AS revenue_today,
       count(*) FILTER (WHERE status = 'pending')::int AS pending,
+      count(*) FILTER (WHERE payment_status = 'awaiting')::int AS awaiting_payment,
       COALESCE(avg(total) FILTER (WHERE status <> 'cancelled' AND created_at >= ${since}), 0) AS avg_order,
       count(DISTINCT phone) FILTER (WHERE created_at >= ${since})::int AS buyers
       FROM orders`),
@@ -106,6 +107,18 @@ router.patch('/orders/:id', async (req, res) => {
     );
   }
   const { rows } = await query('UPDATE orders SET status = $1 WHERE id = $2 RETURNING *', [status, req.params.id]);
+  res.json(rows[0]);
+});
+
+// Confirm / reject an electronic transfer on a store order
+router.post('/orders/:id/payment', async (req, res) => {
+  const status = { confirm: 'paid', reject: 'rejected' }[req.body?.action];
+  if (!status) return bad(res, 'إجراء غير معروف');
+  const { rows } = await query(
+    `UPDATE orders SET payment_status = $1 WHERE id = $2 AND payment_status IN ('awaiting', 'paid', 'rejected') RETURNING *`,
+    [status, req.params.id]
+  );
+  if (!rows[0]) return bad(res, 'هذا الطلب دفعه عند الاستلام');
   res.json(rows[0]);
 });
 

@@ -20,6 +20,9 @@ router.get('/stats', async (_req, res) => {
     (SELECT count(*)::int FROM market_orders WHERE status = 'completed') AS completed_orders,
     (SELECT COALESCE(sum(price), 0) FROM market_orders WHERE status = 'completed') AS gmv,
     (SELECT COALESCE(sum(commission), 0) FROM market_orders WHERE status = 'completed') AS commission,
+    (SELECT COALESCE(sum(commission), 0) FROM market_orders WHERE status = 'completed' AND commission_status = 'paid') AS commission_collected,
+    (SELECT COALESCE(sum(commission), 0) FROM market_orders WHERE status = 'completed' AND commission > 0 AND commission_status = 'unpaid') AS commission_due,
+    (SELECT count(*)::int FROM commission_payments WHERE status = 'pending') AS pending_commissions,
     (SELECT count(*)::int FROM listing_reports WHERE status = 'open') AS open_reports`);
   res.json(rows[0]);
 });
@@ -175,6 +178,55 @@ router.post('/promotions/:id', async (req, res) => {
     return res.json(up[0]);
   }
   bad(res, 'إجراء غير معروف');
+});
+
+/* ---------- Commission payments ---------- */
+router.get('/commissions', async (req, res) => {
+  const { status } = req.query;
+  const params = [];
+  let where = 'true';
+  if (['pending', 'approved', 'rejected'].includes(status)) {
+    params.push(status);
+    where = 'p.status = $1';
+  }
+  const [payments, debtors] = await Promise.all([
+    query(
+      `SELECT p.*, u.name AS seller_name, u.phone AS seller_phone
+       FROM commission_payments p LEFT JOIN users u ON u.id = p.seller_id
+       WHERE ${where} ORDER BY (p.status = 'pending') DESC, p.created_at DESC LIMIT 200`,
+      params
+    ),
+    // Sellers who still owe commission and haven't sent a payment
+    query(
+      `SELECT u.id, u.name, u.phone, sum(o.commission) AS due, count(*)::int AS orders
+       FROM market_orders o JOIN users u ON u.id = o.seller_id
+       WHERE o.status = 'completed' AND o.commission > 0 AND o.commission_status = 'unpaid'
+       GROUP BY u.id ORDER BY due DESC LIMIT 100`
+    ),
+  ]);
+  res.json({ payments: payments.rows, debtors: debtors.rows });
+});
+
+router.post('/commissions/:id', async (req, res) => {
+  const { action, note } = req.body || {};
+  const { rows } = await query('SELECT * FROM commission_payments WHERE id = $1', [parseInt(req.params.id) || 0]);
+  const p = rows[0];
+  if (!p) return bad(res, 'الدفعة غير موجودة', 404);
+  if (p.status !== 'pending') return bad(res, 'تمت مراجعة هذه الدفعة مسبقاً');
+  if (action === 'reject' && !note?.trim()) return bad(res, 'اكتبي سبب الرفض (مثلاً: لم يصل المبلغ)');
+  if (!['approve', 'reject'].includes(action)) return bad(res, 'إجراء غير معروف');
+
+  const approved = action === 'approve';
+  // Approved: the orders' commission is paid. Rejected: back to unpaid so the seller can pay again
+  await query(
+    `UPDATE market_orders SET commission_status = $1 WHERE id = ANY($2) AND commission_status = 'pending'`,
+    [approved ? 'paid' : 'unpaid', p.order_ids]
+  );
+  const { rows: up } = await query(
+    `UPDATE commission_payments SET status = $1, admin_note = $2 WHERE id = $3 RETURNING *`,
+    [approved ? 'approved' : 'rejected', note?.trim() || null, p.id]
+  );
+  res.json(up[0]);
 });
 
 /* ---------- Reports ---------- */

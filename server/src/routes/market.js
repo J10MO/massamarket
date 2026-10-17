@@ -169,6 +169,13 @@ async function ensurePhone(userId, phone) {
 router.post('/listings', requireAuth, async (req, res) => {
   const s = await marketOn(res);
   if (!s) return;
+  const limit = Number(s.commission_limit) || 0;
+  if (limit > 0) {
+    const due = await commissionDue(req.user.id);
+    if (due > limit) {
+      return bad(res, `عليچ عمولات مستحقة بقيمة ${due.toLocaleString('en-US')} د.ع. سدّديها من مركز البائعة لتتمكني من نشر إعلانات جديدة.`, 402);
+    }
+  }
   const l = await cleanListing(req.body || {});
   if (typeof l === 'string') return bad(res, l);
   if (!(await ensurePhone(req.user.id, req.body.phone))) return bad(res, 'أدخلي رقم هاتفك ليتواصل معك المشترون');
@@ -258,7 +265,11 @@ router.get('/my/summary', requireAuth, async (req, res) => {
       (SELECT count(*)::int FROM listings WHERE seller_id = $1 AND status = 'active') AS active,
       (SELECT count(*)::int FROM market_orders WHERE seller_id = $1 AND status = 'pending') AS incoming,
       (SELECT count(*)::int FROM market_orders WHERE buyer_id = $1 AND status IN ('pending', 'accepted')) AS purchases_open,
-      (SELECT COALESCE(sum(price - commission), 0) FROM market_orders WHERE seller_id = $1 AND status = 'completed') AS earned`,
+      (SELECT COALESCE(sum(price - commission), 0) FROM market_orders WHERE seller_id = $1 AND status = 'completed') AS earned,
+      (SELECT COALESCE(sum(commission), 0) FROM market_orders
+        WHERE seller_id = $1 AND status = 'completed' AND commission > 0 AND commission_status = 'unpaid') AS commission_due,
+      (SELECT COALESCE(sum(commission), 0) FROM market_orders
+        WHERE seller_id = $1 AND status = 'completed' AND commission_status = 'pending') AS commission_pending`,
     [req.user.id]
   );
   res.json(rows[0]);
@@ -392,6 +403,67 @@ router.post('/listings/:id/promote', requireAuth, async (req, res) => {
     [l.id, req.user.id, plan.days, plan.price, method.name, ref || null, receipt]
   );
   res.status(201).json(rows[0]);
+});
+
+/* ---------------- Commission: sellers pay the site's cut of completed sales ---------------- */
+async function commissionDue(sellerId) {
+  const { rows } = await query(
+    `SELECT COALESCE(sum(commission), 0) AS due FROM market_orders
+     WHERE seller_id = $1 AND status = 'completed' AND commission > 0 AND commission_status = 'unpaid'`,
+    [sellerId]
+  );
+  return Number(rows[0].due);
+}
+
+router.get('/my/commissions', requireAuth, async (req, res) => {
+  const [orders, payments] = await Promise.all([
+    query(
+      `SELECT id, title, image_url, price, commission, commission_status, updated_at FROM market_orders
+       WHERE seller_id = $1 AND status = 'completed' AND commission > 0 ORDER BY updated_at DESC LIMIT 100`,
+      [req.user.id]
+    ),
+    query('SELECT * FROM commission_payments WHERE seller_id = $1 ORDER BY created_at DESC LIMIT 50', [req.user.id]),
+  ]);
+  const due = orders.rows.filter((o) => o.commission_status === 'unpaid').reduce((s, o) => s + Number(o.commission), 0);
+  res.json({ due, orders: orders.rows, payments: payments.rows });
+});
+
+router.post('/commissions/pay', requireAuth, async (req, res) => {
+  const s = await getSettings();
+  const method = (s.payment_methods || []).find((m) => m.name === req.body?.payment_method);
+  if (!method) return bad(res, 'اختاري طريقة الدفع');
+  const ref = String(req.body.payment_ref || '').trim().slice(0, 80) || null;
+  const receipt = /^\/uploads\//.test(req.body.receipt_url || '') ? req.body.receipt_url : null;
+  if (!ref && !receipt) return bad(res, 'أدخلي رقم العملية أو ارفعي صورة الإيصال');
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Bundle every unpaid commission of this seller into one payment for the admin to confirm
+    const { rows } = await client.query(
+      `UPDATE market_orders SET commission_status = 'pending'
+       WHERE seller_id = $1 AND status = 'completed' AND commission > 0 AND commission_status = 'unpaid'
+       RETURNING id, commission`,
+      [req.user.id]
+    );
+    if (!rows.length) {
+      await client.query('ROLLBACK');
+      return bad(res, 'لا توجد عمولات مستحقة عليچ');
+    }
+    const amount = rows.reduce((sum, r) => sum + Number(r.commission), 0);
+    const { rows: p } = await client.query(
+      `INSERT INTO commission_payments (seller_id, amount, order_ids, payment_method, payment_ref, receipt_url)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [req.user.id, amount, rows.map((r) => r.id), method.name, ref, receipt]
+    );
+    await client.query('COMMIT');
+    res.status(201).json(p[0]);
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 });
 
 /* ---------------- Reports ---------------- */

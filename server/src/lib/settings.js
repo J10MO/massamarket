@@ -25,11 +25,10 @@ export const DEFAULT_SETTINGS = {
     { days: 15, price: 10000 },
     { days: 30, price: 18000 },
   ],
-  payment_methods: [
-    { name: 'زين كاش', details: '07XXXXXXXXX' },
-    { name: 'آسيا حوالة', details: '07XXXXXXXXX' },
-    { name: 'FastPay', details: '07XXXXXXXXX' },
-  ],
+  // Electronic payment accounts: used for paid boosts, commission and online store orders
+  payment_methods: [{ name: 'سوبر كي (Super Qi)', details: '07717288459' }],
+  online_payment_enabled: true, // let store customers pay by transfer instead of cash on delivery
+  commission_limit: 25000, // sellers owing more than this can't post new listings (0 = no limit)
   market_terms: 'يجب أن يكون الفستان نظيفاً ومغسولاً وبحالة جيدة، والصور حقيقية للقطعة نفسها. يتم التوصيل والدفع بالتنسيق بين البائعة والمشترية.',
   cities: [
     'بغداد', 'البصرة', 'نينوى', 'أربيل', 'السليمانية', 'دهوك', 'كركوك', 'النجف', 'كربلاء', 'بابل',

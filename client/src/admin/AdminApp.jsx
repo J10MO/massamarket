@@ -82,7 +82,7 @@ export default function AdminApp() {
     if (user?.role !== 'admin') return;
     const load = () => {
       api('/admin/orders?status=pending').then((d) => setPending(d.total)).catch(() => {});
-      api('/admin/market/stats').then((d) => setMarketPending(d.pending_listings + d.pending_promotions)).catch(() => {});
+      api('/admin/market/stats').then((d) => setMarketPending(d.pending_listings + d.pending_promotions + d.pending_commissions)).catch(() => {});
     };
     load();
     const t = setInterval(load, 60000); // new orders badge

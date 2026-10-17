@@ -343,3 +343,7 @@ textarea.a-input { resize: vertical; }
 .a-plan-row + .a-plan-row { margin-top: 8px; }
 .a-plan-row .a-btn { align-self: end; }
 .a-card > .a-btn.sm { margin-top: 10px; }
+.a-block-pill { display: table; margin-top: 4px; }
+.a-paybox { display: grid; gap: 4px; border-radius: 12px; padding: 8px 10px; margin-top: 6px; background: #fff; border: 1px dashed var(--a-line); }
+.a-paybox.pay-awaiting { border-color: #e9c46a; background: #fffaf0; }
+.a-paybox.pay-paid { border-color: #9fd8b4; background: #f2fbf5; }
