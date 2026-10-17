@@ -27,6 +27,19 @@ export function StoreProvider({ children }) {
   const [toast, setToast] = useState(null);
   const [authReady, setAuthReady] = useState(!getToken());
   const [settings, setSettings] = useState(null);
+  const [theme, setTheme] = useState(() => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
+
+  useEffect(() => {
+    // The admin dashboard is designed for light mode only
+    const inAdmin = window.location.pathname.startsWith('/admin');
+    const applied = inAdmin ? 'light' : theme;
+    document.documentElement.dataset.theme = applied;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', applied === 'dark' ? '#1a0e18' : '#4A1D3F');
+    if (inAdmin) return; // don't overwrite the visitor's saved choice
+    try {
+      localStorage.setItem('juman_theme', theme);
+    } catch {}
+  }, [theme]);
 
   useEffect(() => {
     if (getToken()) {
@@ -61,6 +74,8 @@ export function StoreProvider({ children }) {
     return {
       user,
       authReady,
+      theme,
+      toggleTheme: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
       settings: settings || {},
       settingsLoaded: !!settings,
       reloadSettings: loadSettings,
@@ -98,7 +113,7 @@ export function StoreProvider({ children }) {
       toast,
       notify,
     };
-  }, [user, authReady, settings, loadSettings, cart, wishlist, toast, notify, setCart, setWishlist]);
+  }, [user, authReady, theme, settings, loadSettings, cart, wishlist, toast, notify, setCart, setWishlist]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

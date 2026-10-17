@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useStore } from '../store.jsx';
-import { BagIcon, HeartIcon, HomeIcon, InstagramIcon, RecycleIcon, SearchIcon, ShopIcon, UserIcon, WhatsappIcon } from './Icons.jsx';
+import { BagIcon, HeartIcon, HomeIcon, InstagramIcon, MoonIcon, RecycleIcon, SunIcon, SearchIcon, ShopIcon, UserIcon, WhatsappIcon } from './Icons.jsx';
 
 export const waLink = (n) => `https://wa.me/${String(n || '').replace(/\D/g, '')}`;
 export const igHandle = (url) => '@' + (String(url || '').match(/instagram\.com\/([^/?#]+)/)?.[1] || 'katkot__fashion');
@@ -34,7 +34,7 @@ function AnnouncementBar() {
 }
 
 export function Header() {
-  const { cartCount, wishlist } = useStore();
+  const { cartCount, wishlist, theme, toggleTheme } = useStore();
   const [q, setQ] = useState('');
   const navigate = useNavigate();
 
@@ -61,6 +61,14 @@ export function Header() {
             <SearchIcon width="18" height="18" />
             <input type="search" placeholder="ابحثي عن فستان..." value={q} onChange={(e) => setQ(e.target.value)} enterKeyHint="search" />
           </form>
+          <button
+            className="icon-btn theme-btn"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
+            title={theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
+          >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </button>
           <div className="header-icons">
             <Link to="/account" className="icon-btn" aria-label="حسابي"><UserIcon /></Link>
             <Link to="/wishlist" className="icon-btn" aria-label="المفضلة">
