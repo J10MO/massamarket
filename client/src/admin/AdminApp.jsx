@@ -9,6 +9,7 @@ import Categories from './Categories.jsx';
 import Customers from './Customers.jsx';
 import Pinterest from './Pinterest.jsx';
 import Settings from './Settings.jsx';
+import Market from './Market.jsx';
 import './admin.css';
 
 const NAV = [
@@ -16,6 +17,7 @@ const NAV = [
   { to: '/admin/orders', label: 'الطلبات', icon: '🧾', badge: 'pending' },
   { to: '/admin/products', label: 'الفساتين والمنتجات', icon: '👗' },
   { to: '/admin/categories', label: 'الأقسام', icon: '🗂' },
+  { to: '/admin/market', label: 'سوق المستعمل', icon: '♻', badge: 'market' },
   { to: '/admin/customers', label: 'العملاء', icon: '👥' },
   { to: '/admin/pinterest', label: 'استيراد من Pinterest', icon: '📌' },
   { to: '/admin/settings', label: 'الإعدادات', icon: '⚙' },
@@ -69,6 +71,7 @@ export default function AdminApp() {
   const { user, authReady, logout, toast } = useStore();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(0);
+  const [marketPending, setMarketPending] = useState(0);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -77,7 +80,10 @@ export default function AdminApp() {
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (user?.role !== 'admin') return;
-    const load = () => api('/admin/orders?status=pending').then((d) => setPending(d.total)).catch(() => {});
+    const load = () => {
+      api('/admin/orders?status=pending').then((d) => setPending(d.total)).catch(() => {});
+      api('/admin/market/stats').then((d) => setMarketPending(d.pending_listings + d.pending_promotions)).catch(() => {});
+    };
     load();
     const t = setInterval(load, 60000); // new orders badge
     return () => clearInterval(t);
@@ -99,6 +105,7 @@ export default function AdminApp() {
               <span className="a-nav-icon" aria-hidden="true">{n.icon}</span>
               {n.label}
               {n.badge === 'pending' && pending > 0 && <span className="a-count">{pending}</span>}
+              {n.badge === 'market' && marketPending > 0 && <span className="a-count">{marketPending}</span>}
             </NavLink>
           ))}
         </nav>
@@ -126,6 +133,7 @@ export default function AdminApp() {
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/products" element={<Products />} />
             <Route path="/admin/categories" element={<Categories />} />
+            <Route path="/admin/market" element={<Market />} />
             <Route path="/admin/customers" element={<Customers />} />
             <Route path="/admin/pinterest" element={<Pinterest />} />
             <Route path="/admin/settings" element={<Settings />} />

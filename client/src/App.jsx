@@ -10,6 +10,12 @@ import Checkout from './pages/Checkout.jsx';
 import Wishlist from './pages/Wishlist.jsx';
 import Account from './pages/Account.jsx';
 import OrderSuccess from './pages/OrderSuccess.jsx';
+import Market from './market/Market.jsx';
+import Listing from './market/Listing.jsx';
+import Sell from './market/Sell.jsx';
+import SellerCenter from './market/SellerCenter.jsx';
+import { Purchases, Saved, SellerProfile } from './market/Purchases.jsx';
+import './market/market.css';
 
 // The admin dashboard is a separate app, loaded only when /admin is opened
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
@@ -43,11 +49,19 @@ export default function App() {
           <Route path="/order/:id" element={<OrderSuccess />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/market" element={<Market />} />
+          <Route path="/market/:id" element={<Listing />} />
+          <Route path="/sell" element={<Sell />} />
+          <Route path="/sell/:id" element={<Sell />} />
+          <Route path="/my/listings" element={<SellerCenter />} />
+          <Route path="/my/purchases" element={<Purchases />} />
+          <Route path="/my/saved" element={<Saved />} />
+          <Route path="/seller/:id" element={<SellerProfile />} />
           <Route path="*" element={<div className="container empty"><h2>الصفحة غير موجودة</h2></div>} />
         </Routes>
       </main>
       <Footer />
-      {!pathname.startsWith('/product') && <WhatsappButton />}
+      {!['/product', '/market', '/sell', '/my/'].some((p) => pathname.startsWith(p)) && <WhatsappButton />}
       <BottomNav />
       {toast && <div key={toast.id} className="toast" role="status">{toast.msg}</div>}
     </>

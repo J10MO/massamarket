@@ -5,7 +5,7 @@ import { useStore } from '../store.jsx';
 import ProductCard, { Img } from '../components/ProductCard.jsx';
 import { BackIcon, HeartIcon, ReturnIcon, StarIcon, TruckIcon } from '../components/Icons.jsx';
 
-function Gallery({ images, alt }) {
+export function Gallery({ images, alt }) {
   const list = [...new Set(images.filter(Boolean))];
   const track = useRef(null);
   const [index, setIndex] = useState(0);

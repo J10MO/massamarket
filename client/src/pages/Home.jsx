@@ -5,6 +5,7 @@ import { useStore } from '../store.jsx';
 import ProductCard, { Img, ProductGrid } from '../components/ProductCard.jsx';
 import { InstagramIcon, ReturnIcon, StarIcon, TruckIcon } from '../components/Icons.jsx';
 import { igHandle } from '../components/Layout.jsx';
+import { ListingCard } from '../market/shared.jsx';
 
 function SectionTitle({ children, sub, light }) {
   return (
@@ -90,6 +91,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [deals, setDeals] = useState([]);
   const [lookbook, setLookbook] = useState([]);
+  const [used, setUsed] = useState([]);
   const [active, setActive] = useState('all');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +102,7 @@ export default function Home() {
     api('/products?featured=1&category=evening&sort=rating&limit=8').then((d) => setFeatured(d.items)).catch(() => {});
     api('/products?badge=sale&sort=popular&limit=10').then((d) => setDeals(d.items)).catch(() => {});
     api('/products?sort=rating&limit=7&category=evening').then((d) => setLookbook(d.items)).catch(() => {});
+    api('/market/listings?limit=10').then((d) => setUsed(d.items)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -167,6 +170,27 @@ export default function Home() {
               <Link to="/shop?badge=sale" className="btn btn-rose">كل العروض</Link>
             </div>
           </div>
+        </section>
+      )}
+
+      {settings.market_enabled !== false && (
+        <section className="container section">
+          <div className="used-band">
+            <div>
+              <span className="m-tag">♻ جديد في ماسة</span>
+              <h2>سوق المستعمل</h2>
+              <p>فساتين لُبست مرة بأسعار تنافسية — أو بيعي فستانچ واستفيدي من سعره.</p>
+            </div>
+            <div className="used-band-actions">
+              <Link to="/market" className="btn btn-rose">تصفحي المستعمل</Link>
+              <Link to="/sell" className="btn m-ghost">+ بيعي فستانچ</Link>
+            </div>
+          </div>
+          {used.length > 0 && (
+            <div className="scroll-x deals-row used-row">
+              {used.map((l) => <ListingCard key={l.id} listing={l} />)}
+            </div>
+          )}
         </section>
       )}
 

@@ -27,10 +27,10 @@ export const ORDER_STATUS = {
   cancelled: 'ملغي',
 };
 
-export async function uploadImages(files) {
+export async function uploadImages(files, endpoint = '/api/admin/upload') {
   const form = new FormData();
   for (const f of files) form.append('files', f);
-  const res = await fetch('/api/admin/upload', { method: 'POST', headers: { Authorization: `Bearer ${getToken()}` }, body: form });
+  const res = await fetch(endpoint, { method: 'POST', headers: { Authorization: `Bearer ${getToken()}` }, body: form });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || 'تعذر رفع الصورة');
   return data.urls;

@@ -28,3 +28,4 @@ export const WhatsappIcon = (p) => (
   </svg>
 );
 export const InstagramIcon = (p) => base(<><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".6" fill="currentColor" /></>, p);
+export const RecycleIcon = (p) => base(<><path d="M7 19H4.5a1.5 1.5 0 0 1-1.3-2.25L5.5 13" /><path d="m11 19 2-2-2-2" /><path d="M13 17h6.5a1.5 1.5 0 0 0 1.3-2.25L19 11.5" /><path d="m8.5 8.5-3 .5-.5-3" /><path d="M5.5 9 8.2 4.3a1.5 1.5 0 0 1 2.6 0l1.7 3" /><path d="m17.5 10.5.5-3 3 .5" /></>, p);

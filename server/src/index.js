@@ -7,7 +7,10 @@ import cors from 'cors';
 import catalogRoutes from './routes/catalog.js';
 import authRoutes from './routes/auth.js';
 import orderRoutes from './routes/orders.js';
-import adminRoutes, { UPLOAD_DIR } from './routes/admin.js';
+import adminRoutes from './routes/admin.js';
+import marketRoutes from './routes/market.js';
+import adminMarketRoutes from './routes/adminMarket.js';
+import { UPLOAD_DIR } from './lib/upload.js';
 import { query } from './db.js';
 import { ensureDefaultSettings } from './lib/settings.js';
 
@@ -35,6 +38,8 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api', wrap(catalogRoutes));
 app.use('/api/auth', wrap(authRoutes));
 app.use('/api/orders', wrap(orderRoutes));
+app.use('/api/market', wrap(marketRoutes));
+app.use('/api/admin/market', wrap(adminMarketRoutes));
 app.use('/api/admin', wrap(adminRoutes));
 
 // Serve the built React app in production

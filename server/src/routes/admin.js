@@ -1,25 +1,9 @@
 import { Router } from 'express';
-import fs from 'node:fs';
-import path from 'node:path';
-import crypto from 'node:crypto';
-import { fileURLToPath } from 'node:url';
-import multer from 'multer';
 import { query } from '../db.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { importAllCategories, importFromPinterest } from '../lib/importer.js';
 import { getSettings, saveSettings } from '../lib/settings.js';
-
-export const UPLOAD_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../uploads');
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (_req, file, cb) => cb(null, `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${path.extname(file.originalname).toLowerCase() || '.jpg'}`),
-  }),
-  limits: { fileSize: 8 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|gif|avif)$/.test(file.mimetype)),
-});
+import { upload, uploadHandler } from '../lib/upload.js';
 
 const router = Router();
 router.use(requireAdmin);
@@ -223,10 +207,7 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 /* ---------------- Uploads ---------------- */
-router.post('/upload', upload.array('files', 10), (req, res) => {
-  if (!req.files?.length) return bad(res, 'ارفعي صورة بصيغة JPG أو PNG أو WEBP (حتى 8MB)');
-  res.json({ urls: req.files.map((f) => `/uploads/${f.filename}`) });
-});
+router.post('/upload', upload.array('files', 10), uploadHandler);
 
 /* ---------------- Categories ---------------- */
 router.get('/categories', async (_req, res) => {

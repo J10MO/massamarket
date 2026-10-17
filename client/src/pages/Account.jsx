@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ORDER_STATUS, price } from '../api.js';
 import { useStore } from '../store.jsx';
 import { Img } from '../components/ProductCard.jsx';
@@ -7,6 +7,8 @@ import { Img } from '../components/ProductCard.jsx';
 function AuthForm() {
   const { login, notify } = useStore();
   const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const next = params.get('next');
   const [mode, setMode] = useState(params.get('mode') === 'register' ? 'register' : 'login');
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [error, setError] = useState('');
@@ -20,6 +22,8 @@ function AuthForm() {
     try {
       const { token, user } = await api(`/auth/${mode}`, { method: 'POST', body: form });
       login(token, user);
+      // Return to the page that asked for sign-in (only same-site paths)
+      if (next?.startsWith('/') && !next.startsWith('//')) navigate(next, { replace: true });
       // Admins get the full dashboard in its own window
       if (user.role === 'admin' && !window.open('/admin', 'massa-admin')) notify('اسمحي بالنوافذ المنبثقة لفتح لوحة التحكم');
     } catch (err) {
@@ -78,7 +82,15 @@ export default function Account() {
         <a href="/admin" target="massa-admin" className="btn btn-primary btn-block">فتح لوحة التحكم ↗</a>
       )}
 
-      <h2 className="h2">طلباتي</h2>
+      <nav className="acc-links">
+        <Link to="/my/listings"><span>🏷</span>مركز البائعة<small>إعلاناتي وطلبات الشراء</small></Link>
+        <Link to="/my/purchases"><span>🛍</span>مشترياتي من المستعمل<small>طلباتي من البائعات</small></Link>
+        <Link to="/sell"><span>➕</span>بيعي فستانچ<small>إعلان مجاني</small></Link>
+        <Link to="/wishlist"><span>♡</span>المفضلة<small>من المتجر</small></Link>
+        <Link to="/my/saved"><span>♡</span>المحفوظة<small>من المستعمل</small></Link>
+      </nav>
+
+      <h2 className="h2">طلباتي من المتجر</h2>
       {orders === null && <div className="spinner" />}
       {orders?.length === 0 && <p className="muted">لا توجد طلبات بعد. <Link to="/shop">ابدئي التسوق</Link></p>}
       {orders?.map((o) => (

@@ -317,3 +317,29 @@ textarea.a-input { resize: vertical; }
 @media (min-width: 1400px) { .a-products { grid-template-columns: repeat(5, 1fr); } }
 .a-images .a-row { flex-wrap: nowrap; }
 .a-images .a-row .a-input { flex: 1; min-width: 0; }
+
+/* Marketplace admin */
+.a-seg.wide { display: flex; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.a-seg.wide button { flex: 1 0 auto; display: inline-flex; align-items: center; gap: 6px; }
+.a-seg.wide .a-count { margin: 0; }
+.a-review-imgs { display: flex; gap: 8px; overflow-x: auto; }
+.a-review-imgs img { width: 130px; height: 170px; object-fit: cover; border-radius: 12px; background: var(--media-bg); }
+.a-cell-img { display: flex; align-items: center; gap: 8px; min-width: 160px; }
+.a-cell-img img { width: 36px; height: 46px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.a-flag.ls-pending { background: #fff4dc; color: #8a5800; }
+.a-flag.ls-active { background: #e6edff; color: #2448a8; }
+.a-flag.ls-reserved { background: #efe8ff; color: #5a30b5; }
+.a-flag.ls-sold { background: #e3f7ea; color: #1d7043; }
+.a-flag.ls-rejected { background: #fdecea; color: #b3261e; }
+.a-danger-bg { background: #b3261e !important; }
+.a-dim { opacity: .55; }
+.a-alert-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(135deg, #4a2a4f, #0b1a3e); color: #fff; border: 0; }
+.a-alert-card h3 { color: #fff; }
+.a-alert-card p { margin: 0; color: rgba(255, 255, 255, .8); font-size: 14px; }
+.a-plan-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; }
+.a-plan-row.pay { grid-template-columns: 1fr 1.3fr auto; }
+.a-sub { margin: 18px 0 8px; color: var(--navy); font-size: 15px; }
+.a-plan-row label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; }
+.a-plan-row + .a-plan-row { margin-top: 8px; }
+.a-plan-row .a-btn { align-self: end; }
+.a-card > .a-btn.sm { margin-top: 10px; }

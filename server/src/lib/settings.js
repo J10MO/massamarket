@@ -15,6 +15,22 @@ export const DEFAULT_SETTINGS = {
   hero_title_accent: 'في كل مناسبة',
   hero_subtitle: 'أناقة • تميّز • اختيار راقٍ — لأنچ تستحقين الأجمل دائماً.',
   announcements: ['📦 توصيل لجميع المحافظات', 'الدفع عند الاستلام ✦', 'استبدال مجاني خلال 7 أيام ✦'],
+  // Used-dress marketplace
+  market_enabled: true,
+  market_auto_approve: false, // false = admin reviews every new listing
+  market_commission: 5, // % taken from each completed sale
+  boost_plans: [
+    { days: 3, price: 3000 },
+    { days: 7, price: 6000 },
+    { days: 15, price: 10000 },
+    { days: 30, price: 18000 },
+  ],
+  payment_methods: [
+    { name: 'زين كاش', details: '07XXXXXXXXX' },
+    { name: 'آسيا حوالة', details: '07XXXXXXXXX' },
+    { name: 'FastPay', details: '07XXXXXXXXX' },
+  ],
+  market_terms: 'يجب أن يكون الفستان نظيفاً ومغسولاً وبحالة جيدة، والصور حقيقية للقطعة نفسها. يتم التوصيل والدفع بالتنسيق بين البائعة والمشترية.',
   cities: [
     'بغداد', 'البصرة', 'نينوى', 'أربيل', 'السليمانية', 'دهوك', 'كركوك', 'النجف', 'كربلاء', 'بابل',
     'ديالى', 'الأنبار', 'صلاح الدين', 'واسط', 'ذي قار', 'ميسان', 'المثنى', 'القادسية', 'حلبجة',

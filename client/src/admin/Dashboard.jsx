@@ -120,6 +120,7 @@ function Kpi({ label, value, sub, to }) {
 export default function Dashboard() {
   const [days, setDays] = useState(30);
   const { data, error, loading } = useApi(`/admin/dashboard?days=${days}`);
+  const market = useApi('/admin/market/stats');
 
   if (error) return <p className="a-error">{error}</p>;
   if (!data) return <Loading />;
@@ -146,6 +147,16 @@ export default function Dashboard() {
         <Kpi label="المنتجات المعروضة" value={k.products} sub={`${k.hidden} مخفي · ${k.categories} أقسام`} to="/admin/products" />
         <Kpi label="الحسابات المسجلة" value={k.users} sub="عميلات" to="/admin/customers" />
       </div>
+
+      {market.data && (market.data.pending_listings > 0 || market.data.pending_promotions > 0) && (
+        <div className="a-card a-alert-card">
+          <div>
+            <h3>♻ سوق المستعمل يحتاج انتباهچ</h3>
+            <p>{market.data.pending_listings} إعلان بانتظار المراجعة · {market.data.pending_promotions} طلب ترويج بانتظار تأكيد الدفع</p>
+          </div>
+          <Link to={`/admin/market?tab=${market.data.pending_listings ? 'listings' : 'promotions'}`} className="a-btn">مراجعة الآن</Link>
+        </div>
+      )}
 
       <div className="a-grid-2 wide-first">
         <SalesChart data={data.daily} />

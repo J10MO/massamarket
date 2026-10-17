@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useStore } from '../store.jsx';
-import { BagIcon, HeartIcon, HomeIcon, InstagramIcon, SearchIcon, ShopIcon, UserIcon, WhatsappIcon } from './Icons.jsx';
+import { BagIcon, HeartIcon, HomeIcon, InstagramIcon, RecycleIcon, SearchIcon, ShopIcon, UserIcon, WhatsappIcon } from './Icons.jsx';
 
 export const waLink = (n) => `https://wa.me/${String(n || '').replace(/\D/g, '')}`;
 export const igHandle = (url) => '@' + (String(url || '').match(/instagram\.com\/([^/?#]+)/)?.[1] || 'massa_desgin');
@@ -54,7 +54,8 @@ export function Header() {
             <NavLink to="/shop">المتجر</NavLink>
             <NavLink to="/shop?badge=sale">العروض</NavLink>
             <NavLink to="/shop?category=evening">السهرة</NavLink>
-            <NavLink to="/shop?category=abaya">العبايات</NavLink>
+            <NavLink to="/market">سوق المستعمل</NavLink>
+            <NavLink to="/sell" className="nav-sell">+ بيعي فستانچ</NavLink>
           </nav>
           <form className="search" onSubmit={submit} role="search">
             <SearchIcon width="18" height="18" />
@@ -82,7 +83,7 @@ export function BottomNav() {
   const items = [
     { to: '/', label: 'الرئيسية', Icon: HomeIcon, end: true },
     { to: '/shop', label: 'المتجر', Icon: ShopIcon },
-    { to: '/wishlist', label: 'المفضلة', Icon: HeartIcon },
+    { to: '/market', label: 'المستعمل', Icon: RecycleIcon },
     { to: '/cart', label: 'السلة', Icon: BagIcon, count: cartCount },
     { to: '/account', label: user ? 'حسابي' : 'دخول', Icon: UserIcon },
   ];
@@ -121,6 +122,8 @@ export function Footer() {
           <Link to="/shop?category=engagement">فساتين خطوبة</Link>
           <Link to="/shop?category=casual">فساتين كاجوال</Link>
           <Link to="/shop?category=abaya">عبايات</Link>
+          <Link to="/market">سوق المستعمل</Link>
+          <Link to="/sell">بيعي فستانچ</Link>
         </div>
         <div>
           <h4>المساعدة</h4>

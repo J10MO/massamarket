@@ -82,3 +82,82 @@ CREATE TABLE IF NOT EXISTS settings (
 
 CREATE INDEX IF NOT EXISTS orders_created_idx ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS orders_phone_idx ON orders(phone);
+
+-- v3: used-dress marketplace (customers sell to customers) + paid boosts
+CREATE TABLE IF NOT EXISTS listings (
+  id             SERIAL PRIMARY KEY,
+  seller_id      INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id    INT REFERENCES categories(id) ON DELETE SET NULL,
+  title          TEXT NOT NULL,
+  description    TEXT,
+  size           TEXT NOT NULL,
+  condition      TEXT NOT NULL CHECK (condition IN ('new_tag', 'like_new', 'very_good', 'good')),
+  brand          TEXT,
+  color          TEXT,
+  price          NUMERIC(12,2) NOT NULL CHECK (price > 0),
+  original_price NUMERIC(12,2),
+  images         TEXT[] NOT NULL DEFAULT '{}',
+  city           TEXT NOT NULL,
+  status         TEXT NOT NULL DEFAULT 'pending'
+                 CHECK (status IN ('pending', 'active', 'reserved', 'sold', 'rejected', 'hidden')),
+  reject_reason  TEXT,
+  views          INT NOT NULL DEFAULT 0,
+  boosted_until  TIMESTAMPTZ,
+  sold_at        TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS listings_status_idx ON listings(status, boosted_until DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS listings_seller_idx ON listings(seller_id);
+
+CREATE TABLE IF NOT EXISTS market_orders (
+  id          SERIAL PRIMARY KEY,
+  listing_id  INT REFERENCES listings(id) ON DELETE SET NULL,
+  seller_id   INT REFERENCES users(id) ON DELETE SET NULL,
+  buyer_id    INT REFERENCES users(id) ON DELETE SET NULL,
+  title       TEXT NOT NULL,
+  image_url   TEXT,
+  price       NUMERIC(12,2) NOT NULL,
+  commission  NUMERIC(12,2) NOT NULL DEFAULT 0,
+  buyer_name  TEXT NOT NULL,
+  buyer_phone TEXT NOT NULL,
+  city        TEXT NOT NULL,
+  address     TEXT NOT NULL,
+  notes       TEXT,
+  status      TEXT NOT NULL DEFAULT 'pending'
+              CHECK (status IN ('pending', 'accepted', 'rejected', 'completed', 'cancelled')),
+  seller_note TEXT,
+  rating      INT CHECK (rating BETWEEN 1 AND 5),
+  review      TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS market_orders_seller_idx ON market_orders(seller_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS market_orders_buyer_idx ON market_orders(buyer_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS promotions (
+  id             SERIAL PRIMARY KEY,
+  listing_id     INT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  user_id        INT REFERENCES users(id) ON DELETE SET NULL,
+  days           INT NOT NULL CHECK (days > 0),
+  amount         NUMERIC(12,2) NOT NULL,
+  payment_method TEXT NOT NULL,
+  payment_ref    TEXT,
+  receipt_url    TEXT,
+  status         TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'rejected')),
+  admin_note     TEXT,
+  starts_at      TIMESTAMPTZ,
+  ends_at        TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS promotions_status_idx ON promotions(status, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS listing_reports (
+  id         SERIAL PRIMARY KEY,
+  listing_id INT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  user_id    INT REFERENCES users(id) ON DELETE SET NULL,
+  reason     TEXT NOT NULL,
+  details    TEXT,
+  status     TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'resolved')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
